@@ -52,12 +52,12 @@ class ElectricityCalculator:
         }
 
     def show_interface(self):
-        st.title(" سیستەمی هەژمارکردنی نرخی کارەبا")
+        st.title("⚡ سیستەمی هەژمارکردنی نرخی کارەبا")
         st.write("---")
 
         user_category = st.selectbox(
             "جۆری هاوبەش هەڵبژێرە:",
-            ["ماڵان", "بازرگانی", "پیشەسازی گەورە", "پیشەسازی", "میری(حکومی)", "کشتوکاڵ"]
+            ["ماڵان", "بازرگانی", "پیشەسازی گەورە", "پیشەسازی", "میری", "کشتوکاڵ"]
         )
         
         usage_kwh = st.number_input("بڕی بەکارهێنان بە (kWh):", min_value=0, step=1)
@@ -133,4 +133,3 @@ class ElectricityCalculator:
 if __name__ == "__main__":
     app = ElectricityCalculator()
     app.run_calculation()
-
