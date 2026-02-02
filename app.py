@@ -1,159 +1,126 @@
 import streamlit as st
 
-class CalKWH:
-    def __init__(self):
-        self.kwh = 0
-        self.low_price = 72
-        self.mid_price = 108
-        self.high_price = 175
-        self.business = 150
-    
-    # حیسابکردنی کارەبای ماڵان
-    def calculate_home(self, kwh):
-        if kwh <= 400:
-            total = kwh * self.low_price
-            details = [(kwh, self.low_price, total)]
-            return total, details
-        
-        elif kwh <= 800:
-            part1 = 400 * self.low_price
-            part2 = (kwh - 400) * self.mid_price
-            total = part1 + part2
-            details = [
-                (400, self.low_price, part1),
-                (kwh - 400, self.mid_price, part2)
-            ]
-            return total, details
-        
-        else:
-            part1 = 400 * self.low_price
-            part2 = 400 * self.mid_price
-            part3 = (kwh - 800) * self.high_price
-            total = part1 + part2 + part3
-            details = [
-                (400, self.low_price, part1),
-                (400, self.mid_price, part2),
-                (kwh - 800, self.high_price, part3)
-            ]
-            return total, details
-    
-    # حیسابکردنی کارەبای بازرگانی
-    def calculate_business(self, kwh):
-        total = kwh * self.business
-        details = [(kwh, self.business, total)]
-        return total, details
+# ڕێکخستنی شێوازی پەڕەکە
+st.set_page_config(page_title="حیسابی کارەبا", page_icon="⚡")
 
-
-# ڕێکخستنی پەڕە
-st.set_page_config(page_title="هەژمارکردنی کارەبا", layout="centered")
-
-# CSS بۆ ناوەڕاستکردنی نووسین
+# ستایلی تایبەت بۆ زمانی کوردی (RTL)
 st.markdown("""
-<style>
-    .stApp {
+    <style>
+    body, div, p, h1, h2, h3, h4, span, label {
+        direction: rtl;
+        text-align: right;
+        font-family: 'Tahoma', sans-serif;
+    }
+    .stSelectbox, .stNumberInput {
         direction: rtl;
     }
+    /* بۆ ئەوەی خشتەکان جوان دەرکەون */
     div[data-testid="column"] {
+        background-color: #f0f2f6;
+        padding: 10px;
+        border-radius: 10px;
+        margin: 5px;
         text-align: center;
     }
-</style>
-""", unsafe_allow_html=True)
+    </style>
+    """, unsafe_allow_html=True)
 
-# سەرناو
-st.title("هەژمارکردنی نرخی کارەبا")
-st.markdown("---")
-
-# دروستکردنی کلاس
-calc = CalKWH()
-
-# هەڵبژاردنی جۆر
-st.subheader("جۆری بەکارهێنەر")
-
-# دوو دوگمە بۆ هەڵبژاردن
-col1, col2 = st.columns(2)
-with col1:
-    if st.button("ماڵان", use_container_width=True):
-        st.session_state.user_type = 1
-with col2:
-    if st.button("بازرگانی", use_container_width=True):
-        st.session_state.user_type = 2
-
-# هەڵبژاردنی ئێستا نیشان بدە
-if 'user_type' not in st.session_state:
-    st.session_state.user_type = 1
-
-if st.session_state.user_type == 1:
-    st.info("هەڵبژاردراو: ماڵان")
-else:
-    st.info("هەڵبژاردراو: بازرگانی")
-
-st.markdown("---")
-
-# نووسینی بڕی کارەبا
-st.subheader("بڕی کارەبا")
-kwh = st.number_input(
-    "تکایە رێژەی بەکارهێنانی کارەبا بنووسە بە kWh:",
-    min_value=0,
-    value=0,
-    step=10
-)
-
-st.markdown("---")
-
-# حیسابکردن و نیشاندان
-if kwh > 0:
-    st.subheader("ئەنجامی هەژمارکردنەکە")
-    
-    if st.session_state.user_type == 1:
-        # ماڵان
-        total, details = calc.calculate_home(kwh)
+class CalKWh:
+    def __init__(self):
+        # نرخی ماڵان (قۆناغ بە قۆناغ)
+        self.home_prices = {
+            "tier1": 72,   # 1 - 400
+            "tier2": 108,  # 401 - 800
+            "tier3": 172,  # 801 - 1200
+            "tier4": 260,  # 1201 - 1600
+            "tier5": 350   # > 1600
+        }
         
-        # نیشاندانی وردەکاری
-        st.markdown("#### وردەکاری هەژمارکردنەکە:")
-        
-        counter = 1
-        for item in details:
-            amount = item[0]
-            price = item[1]
-            cost = item[2]
-            
-            col1, col2, col3 = st.columns([2, 2, 2])
-            with col1:
-                st.write(f"**بەشی {counter}**")
-            with col2:
-                st.write(f"{amount:,} kWh × {price} دینار")
-            with col3:
-                st.write(f"**{cost:,} دینار**")
-            
-            counter = counter + 1
+        # نرخی شوێنەکانی تر (جێگیر)
+        self.flat_prices = {
+            "بازرگانی": 185,
+            "پیشەسازی گەورە": 125,
+            "پیشەسازی": 160,
+            "میری (حکومی)": 160,
+            "کشتوکاڵ": 60
+        }
+
+    def run_app(self):
+        st.title("⚡ سیستەمی زیرەکی حیسابکردنی کارەبا")
+        st.write("بەخێربێیت **کاک ئامانج**، جۆری هاوبەش هەڵبژێرە بۆ حیسابکردن.")
+
+        # دروستکردنی لیستی هەڵبژاردن
+        options = ["ماڵان"] + list(self.flat_prices.keys())
+        user_type = st.selectbox("جۆری بەکارهێنەر هەڵبژێرە:", options)
+
+        kwh = st.number_input("بڕی بەکارهێنان بە (kWh) بنووسە:", min_value=0, step=1)
+
+        if st.button("حیسابی بکە 🧮"):
+            if kwh == 0:
+                st.warning("تکایە بڕی کارەبا بنووسە!")
+            elif user_type == "ماڵان":
+                self.calculate_home(kwh)
+            else:
+                self.calculate_flat(user_type, kwh)
+
+    def calculate_flat(self, u_type, kwh):
+        price = self.flat_prices[u_type]
+        total = kwh * price
+        st.success(f"جۆری بەکارهێنەر: **{u_type}**")
+        st.info(f"نرخی یەکەیەک: {price} دینار")
+        st.metric(label="کۆی گشتی پارەکە", value=f"{total:,} دینار")
+
+    def calculate_home(self, kwh):
+        total = 0
+        remaining_kwh = kwh
+        breakdown = [] # بۆ هەڵگرتنی وردەکارییەکان
+
+        # قۆناغی یەکەم (1-400)
+        if remaining_kwh > 0:
+            amount = min(remaining_kwh, 400)
+            cost = amount * self.home_prices["tier1"]
+            total += cost
+            breakdown.append(f"400 ــی یەکەم: {amount} * {self.home_prices['tier1']} = {cost:,}")
+            remaining_kwh -= amount
+
+        # قۆناغی دووەم (401-800)
+        if remaining_kwh > 0:
+            amount = min(remaining_kwh, 400)
+            cost = amount * self.home_prices["tier2"]
+            total += cost
+            breakdown.append(f"400 ــی دووەم: {amount} * {self.home_prices['tier2']} = {cost:,}")
+            remaining_kwh -= amount
+
+        # قۆناغی سێیەم (801-1200) - نرخ 172
+        if remaining_kwh > 0:
+            amount = min(remaining_kwh, 400)
+            cost = amount * self.home_prices["tier3"]
+            total += cost
+            breakdown.append(f"400 ــی سێیەم: {amount} * {self.home_prices['tier3']} = {cost:,}")
+            remaining_kwh -= amount
+
+        # قۆناغی چوارەم (1201-1600) - نرخ 260
+        if remaining_kwh > 0:
+            amount = min(remaining_kwh, 400)
+            cost = amount * self.home_prices["tier4"]
+            total += cost
+            breakdown.append(f"400 ــی چوارەم: {amount} * {self.home_prices['tier4']} = {cost:,}")
+            remaining_kwh -= amount
+
+        # قۆناغی پێنجەم (سەرووی 1600) - نرخ 350
+        if remaining_kwh > 0:
+            cost = remaining_kwh * self.home_prices["tier5"]
+            total += cost
+            breakdown.append(f"سەرووی 1600: {remaining_kwh} * {self.home_prices['tier5']} = {cost:,}")
+
+        # نیشاندانی ئەنجامەکان
+        st.success("وردەکاری حیسابکردنی ماڵان:")
+        for line in breakdown:
+            st.text(line)
         
         st.markdown("---")
-        st.success(f"### کۆی گشتی: **{total:,} دینار**")
-        
-    else:
-        # بازرگانی
-        total, details = calc.calculate_business(kwh)
-        
-        st.markdown("#### وردەکاری هەژمارکردنەکە:")
-        
-        item = details[0]
-        amount = item[0]
-        price = item[1]
-        cost = item[2]
-        
-        col1, col2, col3 = st.columns([2, 2, 2])
-        with col1:
-            st.write("**کارەبای بازرگانی**")
-        with col2:
-            st.write(f"{amount:,} kWh × {price} دینار")
-        with col3:
-            st.write(f"**{cost:,} دینار**")
-        
-        st.markdown("---")
-        st.success(f"### کۆی گشتی: **{total:,} دینار**")
+        st.metric(label="کۆی گشتی پارەکە", value=f"{total:,} دینار")
 
-else:
-    st.info("تکایە بڕی کارەبا بنووسە بۆ بینینی ئەنجام")
-
-st.markdown("---")
-st.caption("سیستەمی هەژمارکردنی نرخی کارەبا")
+if __name__ == "__main__":
+    app = CalKWh()
+    app.run_app()
