@@ -1,6 +1,5 @@
 import streamlit as st
 
-# ئەم کلاسە هەمان لۆژیکی کۆدەکەی خۆتە
 class calkwh:
     def __init__(self):
         self.kwh = 0
@@ -23,7 +22,7 @@ class calkwh:
         
         if self.user_type == 1:
             st.subheader("بەشی کارەبای ماڵان")
-            self.kwh = st.number_input("kwh تکایە رێژەی بەکار هێنانی کارەبا بنووسە بە", min_value=0, key="home_input")
+            self.kwh = st.number_input("kwh تکایە رێژەی بەکار هێنانی کارەبا بنووسە بە", min_value, key="home_input")
             
             if st.button("حیساب بکە"):
                 if self.kwh <= 400: 
@@ -60,4 +59,5 @@ class calkwh:
 # لێرەدا دەستپێدەکات
 if __name__ == "__main__":
     k = calkwh()
+
     k.calculate_kwh()
