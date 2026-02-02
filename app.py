@@ -145,7 +145,7 @@ if kwh > 0:
         with col1:
             st.write("**کارەبای بازرگانی**")
         with col2:
-            st.write(f"{amount:,} kWh × {price} دینار")
+            st.write(f"{amount:,}×kWh  {price} دینار")
         with col3:
             st.write(f"**{cost:,} دینار**")
         
@@ -157,5 +157,6 @@ else:
 
 
 st.caption("سیستەمی هە‌ژمارکردنی نرخی کارەبا")
+
 
 
