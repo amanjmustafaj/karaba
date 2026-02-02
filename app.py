@@ -43,14 +43,13 @@ class calkwh:
                     kwh4 = kwh1 + kwh2 + kwh3
                     st.markdown("### 📊 وردەکاری حیسابەکە:")
 
-                    st.info(f"✅ **هەنگاوی یەکەم:** ٤٠٠ کیلۆواتی یەکەم بە {self.low_price} دینار ← **{kwh1:,}** دینار")
-                    st.info(f"✅ **هەنگاوی دووەم:** ٤٠٠ کیلۆواتی دووەم بە {self.mid_price} دینار ← **{kwh2:,}** دینار")
-                    st.info(f"✅ **هەنگاوی سێیەم:** بڕی زیادە ({self.kwh-800} kWh) بە {self.high_price} دینار ← **{kwh3:,}** دینار")
+                   # لێرە تەنیا وردەکارییەکان بە ڕوونی نیشان دەدەین
+                    st.info(f"🔹 ٤٠٠ کیلۆواتی یەکەم (بە {self.low_price}): {kwh1:,} دینار")
+                    st.info(f"🔹 ٤٠٠ کیلۆواتی دووەم (بە {self.mid_price}): {kwh2:,} دینار")
+                    st.info(f"🔹 بڕی زیادە لە ٨٠٠ کیلۆوات (بە {self.high_price}): {kwh3:,} دینار")
 
-                    st.divider() 
-                    st.success(f"💰 **کۆی گشتی پارەی کارەباکەت: {kwh4:,} دینار**")
-
-                    st.success(f"✅ کۆی گشتی پارەی کارەبا: **{kwh4:,}** دینار")
+                    st.divider() # هێڵێکی جیاکەرەوە بۆ جوانی
+                    st.success(f"💰 کۆی گشتی پارەی کارەبا: **{kwh4:,}** دینار")
             
         elif self.user_type == 2:
             st.subheader("بەشی کارەبای بازرگانی")
@@ -67,6 +66,7 @@ if __name__ == "__main__":
     k = calkwh()
 
     k.calculate_kwh()
+
 
 
 
