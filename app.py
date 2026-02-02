@@ -48,9 +48,7 @@ st.title("حیسابکردنی نرخی کارەبا")
 # دروستکردنی کلاس
 calc = CalKWH()
 
-# هەڵبژاردنی جۆر
-st.write("بۆ زانینی نرخی کارەبای ماڵان ژمارە یەک داگرە")
-st.write("بۆ زانینی نرخی کارەبای دووکان یان بازرگانی ژمارە دوو داگرە")
+
 
 user_type = st.radio("جۆر هەڵبژێرە:", [1, 2], format_func=lambda x: "ماڵان" if x == 1 else "بازرگانی")
 
@@ -66,3 +64,4 @@ if kwh > 0:
         result = calc.calculate_business(kwh)
     
     st.success(result)
+
