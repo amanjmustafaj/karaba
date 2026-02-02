@@ -134,7 +134,7 @@ if kwh > 0:
         # بازرگانی
         total, details = calc.calculate_business(kwh)
         
-        st.markdown("#### وردەکاری حیسابەکە:")
+        st.markdown("#### وردەکاری هەژمارکردنەکە:")
         
         item = details[0]
         amount = item[0]
@@ -145,7 +145,7 @@ if kwh > 0:
         with col1:
             st.write("**کارەبای بازرگانی**")
         with col2:
-            st.write(f"kWh{amount:,}×  دینار{price} ")
+            st.write(f"{amount:,} kWh × {price} دینار")
         with col3:
             st.write(f"**{cost:,} دینار**")
         
@@ -155,10 +155,5 @@ if kwh > 0:
 else:
     st.info("تکایە بڕی کارەبا بنووسە بۆ بینینی ئەنجام")
 
-
-st.caption("سیستەمی هە‌ژمارکردنی نرخی کارەبا")
-
-
-
-
-
+st.markdown("---")
+st.caption("سیستەمی هەژمارکردنی نرخی کارەبا")
