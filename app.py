@@ -32,18 +32,20 @@ class calkwh:
                     kwh1 = (400 * self.low_price) 
                     kwh2 = (self.kwh - 400) * self.mid_price
                     kwh3 = kwh1 + kwh2
-                    st.write(f"la 400kwh * {self.low_price} --> {kwh1:,} denara")
-                    st.write(f"la {self.kwh-400}kwh * {self.mid_price} --> {kwh2:,} denara")
-                    st.success(f"koe gshte {kwh3:,}")
+                    st.info(f"📊 قۆناغی یەکەم: 400kWh × {self.low_price} ← {kwh1:,} دینار")
+                    st.info(f"📊 قۆناغی دووەم: {self.kwh-400}kWh × {self.mid_price} ← {kwh2:,} دینار")
+
+                    st.success(f"✅ کۆی گشتی پارەی کارەبا: **{kwh3:,}** دینار")
                 else: 
                     kwh1 = (400 * self.low_price)
                     kwh2 = (400 * self.mid_price)
                     kwh3 = (self.kwh - 800) * self.high_price
                     kwh4 = kwh1 + kwh2 + kwh3
-                    st.write(f"la 400kwh * {self.low_price} --> {kwh1:,} denara")
-                    st.write(f"la 400kwh * {self.mid_price} --> {kwh2:,} denara")
-                    st.write(f"la {self.kwh-800}kwh * {self.high_price} --> {kwh3:,} denara")
-                    st.success(f"koe gshte {kwh4:,}")
+                    st.info(f"🔹 400 ی یەکەم: 400kWh × {self.low_price} ← {kwh1:,} دینار")
+                    st.info(f"🔹 400 ی دووەم: 400kWh × {self.mid_price} ← {kwh2:,} دینار")
+                    st.info(f"🔹 ئەوەی ماوە: {self.kwh-800}kWh × {self.high_price} ← {kwh3:,} دینار")
+
+                    st.success(f"✅ کۆی گشتی پارەی کارەبا: **{kwh4:,}** دینار")
             
         elif self.user_type == 2:
             st.subheader("بەشی کارەبای بازرگانی")
@@ -51,8 +53,7 @@ class calkwh:
             
             if st.button("حیساب بکە"):
                 kwh5 = self.kwh * self.bussnis
-                st.success(f"rezhay bakar henae karaba {self.kwh} * {self.bussnis} --> {kwh5:,} dinar")
-            
+                st.success(f"🏢 کارەبای بازرگانی: {self.kwh} kWh × {self.bussnis} دینار ← کۆی گشتی: **{kwh5:,}** دینار")            
         elif self.user_type != 0:
             st.error("ببورە ژمارەکە هەڵەیە تکایە تەنیا ژمارە یەک یان دوو هەڵبژێرە")
 
@@ -61,5 +62,6 @@ if __name__ == "__main__":
     k = calkwh()
 
     k.calculate_kwh()
+
 
 
