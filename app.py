@@ -1,86 +1,135 @@
 import streamlit as st
 
 # ==========================================
-# بەشی دیزاین (هەر وەک خۆی دامناوەتەوە)
+# 1. ڕێکخستنی دیزاین و سەنتەرکردن (CSS)
 # ==========================================
 st.set_page_config(page_title="حیسابی کارەبا", page_icon="⚡")
 
 st.markdown("""
     <style>
-    body, .stApp {
+    /* هەموو شتێک بهێنە ناوەڕاست */
+    .stApp {
+        text-align: center;
         direction: rtl;
-        text-align: right;
-        font-family: 'Tahoma', sans-serif;
     }
-    div[data-testid="stVerticalBlock"] {
-        align-items: end;
+    
+    /* سەنتەرکردنی ناونیشان و نووسینەکان */
+    h1, h2, h3, p, div {
+        text-align: center !important;
     }
-    .stSelectbox, .stNumberInput {
+
+    /* سەنتەرکردنی لیستی هەڵبژاردن و شوێنی ژمارە */
+    .stSelectbox label, .stNumberInput label {
+        text-align: center !important;
+        width: 100%;
+        font-size: 18px;
+        font-weight: bold;
+    }
+    
+    /* سەنتەرکردنی ناوەڕۆکی ئینپوتەکان */
+    .stSelectbox div[data-baseweb="select"] {
+        direction: rtl; 
+        text-align: center;
+    }
+
+    /* دوگمەکە بهێنە ناوەڕاست */
+    div.stButton > button {
+        display: block;
+        margin: 0 auto;
+        width: 50%;
+        font-size: 20px;
+    }
+    
+    /* بۆکسەکانی ئەنجام (Success/Info) */
+    .stAlert {
         direction: rtl;
+        text-align: center;
     }
     </style>
     """, unsafe_allow_html=True)
 
 # ==========================================
-# بەشی بەرنامەکە (بەبێ Class - زۆر سادە)
+# 2. دروستکردنی کڵاس (Class Structure)
 # ==========================================
+class CalKWh:
+    def __init__(self):
+        # نرخەکان لێرە دیاری دەکەین
+        self.prices_home = [72, 108, 172, 260, 350] # نرخەکانی ماڵان
+        self.price_business = 185      # بازرگانی
+        self.price_large_ind = 125     # پیشەسازی گەورە
+        self.price_ind = 160           # پیشەسازی
+        self.price_gov = 160           # میری
+        self.price_agri = 60           # کشتوکاڵ
 
-st.title("⚡ حیسابکردنی نرخی کارەبا")
-st.write("بەخێربێیت **کاک ئامانج**، تکایە زانیارییەکان پڕ بکەرەوە:")
+    def get_user_input(self):
+        st.title("⚡ حیسابکردنی نرخی کارەبا")
+        st.write("بەخێربێیت **کاک ئامانج**")
+        st.write("---")
 
-# ١. هەڵبژاردنی جۆر
-jori_hawbash = st.selectbox(
-    "جۆری هاوبەش هەڵبژێرە:",
-    ["ماڵان", "بازرگانی", "پیشەسازی گەورە", "پیشەسازی", "میری", "کشتوکاڵ"]
-)
+        # وەرگرتنی زانیاری
+        user_type = st.selectbox(
+            "جۆری هاوبەش هەڵبژێرە:",
+            ["ماڵان", "بازرگانی", "پیشەسازی گەورە", "پیشەسازی", "میری", "کشتوکاڵ"]
+        )
 
-# ٢. وەرگرتنی بڕی کارەبا
-kwh = st.number_input("بڕی بەکارهێنان (kWh):", min_value=0, step=1)
+        kwh = st.number_input("بڕی بەکارهێنان (kWh):", min_value=0, step=1)
+        
+        return user_type, kwh
 
-# ٣. دوگمەی حیسابکردن
-if st.button("حیسابی بکە"):
-    
-    total_price = 0  # کۆی پارەکە
+    def calculate(self):
+        # بانگکردنی فەنکشنی وەرگرتنی زانیاری
+        user_type, kwh = self.get_user_input()
 
-    # ---- ئەگەر ماڵان بوو (بە قادرمە) ----
-    if jori_hawbash == "ماڵان":
-        if kwh <= 400:
-            total_price = kwh * 72
-        elif kwh <= 800:
-            total_price = (400 * 72) + ((kwh - 400) * 108)
-        elif kwh <= 1200:
-            total_price = (400 * 72) + (400 * 108) + ((kwh - 800) * 172)
-        elif kwh <= 1600:
-            total_price = (400 * 72) + (400 * 108) + (400 * 172) + ((kwh - 1200) * 260)
-        else: # سەرووی ١٦٠٠
-            total_price = (400 * 72) + (400 * 108) + (400 * 172) + (400 * 260) + ((kwh - 1600) * 350)
+        # کاتێک دوگمەکە دەگرێت
+        if st.button("حیسابی بکە"):
+            total_price = 0
             
-        st.info("نرخەکانی ماڵان: (72 - 108 - 172 - 260 - 350)")
+            # --- حیساباتی ماڵان ---
+            if user_type == "ماڵان":
+                if kwh <= 400:
+                    total_price = kwh * self.prices_home[0]
+                elif kwh <= 800:
+                    total_price = (400 * self.prices_home[0]) + \
+                                  ((kwh - 400) * self.prices_home[1])
+                elif kwh <= 1200:
+                    total_price = (400 * self.prices_home[0]) + \
+                                  (400 * self.prices_home[1]) + \
+                                  ((kwh - 800) * self.prices_home[2])
+                elif kwh <= 1600:
+                    total_price = (400 * self.prices_home[0]) + \
+                                  (400 * self.prices_home[1]) + \
+                                  (400 * self.prices_home[2]) + \
+                                  ((kwh - 1200) * self.prices_home[3])
+                else: # سەرووی 1600
+                    total_price = (400 * self.prices_home[0]) + \
+                                  (400 * self.prices_home[1]) + \
+                                  (400 * self.prices_home[2]) + \
+                                  (400 * self.prices_home[3]) + \
+                                  ((kwh - 1600) * self.prices_home[4])
 
-    # ---- ئەگەر بازرگانی بوو ----
-    elif jori_hawbash == "بازرگانی":
-        total_price = kwh * 185
-        st.info("نرخی بازرگانی جێگیرە: 185 دینار")
+            # --- حیساباتی جۆرەکانی تر ---
+            elif user_type == "بازرگانی":
+                total_price = kwh * self.price_business
+            
+            elif user_type == "پیشەسازی گەورە":
+                total_price = kwh * self.price_large_ind
+            
+            elif user_type == "پیشەسازی":
+                total_price = kwh * self.price_ind
+            
+            elif user_type == "میری":
+                total_price = kwh * self.price_gov
+            
+            elif user_type == "کشتوکاڵ":
+                total_price = kwh * self.price_agri
 
-    # ---- ئەگەر پیشەسازی گەورە بوو ----
-    elif jori_hawbash == "پیشەسازی گەورە":
-        total_price = kwh * 125
-        st.info("نرخی پیشەسازی گەورە: 125 دینار")
+            # --- نیشاندانی ئەنجام ---
+            st.success(f"جۆری هاوبەش: {user_type}")
+            st.success(f"💰 کۆی گشتی پارەکە: {total_price:,} دینار")
 
-    # ---- ئەگەر پیشەسازی بوو ----
-    elif jori_hawbash == "پیشەسازی":
-        total_price = kwh * 160
-        st.info("نرخی پیشەسازی: 160 دینار")
-
-    # ---- ئەگەر میری بوو ----
-    elif jori_hawbash == "میری":
-        total_price = kwh * 160
-        st.info("نرخی میری: 160 دینار")
-
-    # ---- ئەگەر کشتوکاڵ بوو ----
-    elif jori_hawbash == "کشتوکاڵ":
-        total_price = kwh * 60
-        st.info("نرخی کشتوکاڵ: 60 دینار")
-
-    # ---- نیشاندانی ئەنجامی کۆتایی ----
-    st.success(f"💰 کۆی گشتی پارەکە دەکاتە: **{total_price:,}** دینار")
+# ==========================================
+# 3. کارپێکردنی بەرنامەکە
+# ==========================================
+if __name__ == "__main__":
+    app = CalKWh()
+    app.calculate()
