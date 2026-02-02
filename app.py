@@ -52,7 +52,7 @@ class ElectricityCalculator:
         }
 
     def show_interface(self):
-        st.title("⚡ سیستەمی هەژمارکردنی نرخی کارەبا")
+        st.title(" سیستەمی هەژمارکردنی نرخی کارەبا")
         st.write("---")
 
         user_category = st.selectbox(
@@ -133,3 +133,4 @@ class ElectricityCalculator:
 if __name__ == "__main__":
     app = ElectricityCalculator()
     app.run_calculation()
+
