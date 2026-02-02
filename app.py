@@ -3,7 +3,7 @@ import streamlit as st
 # ==========================================
 # 1. ڕێکخستنی دیزاین و سەنتەرکردن (CSS)
 # ==========================================
-st.set_page_config(page_title="حیسابی کارەبا", page_icon="⚡")
+st.set_page_config(page_title="هەژمارکردنی کارەبا", page_icon="⚡")
 
 st.markdown("""
     <style>
@@ -32,15 +32,19 @@ st.markdown("""
         text-align: center;
     }
 
-    /* دوگمەکە بهێنە ناوەڕاست */
-    div.stButton > button {
+    /* چاککردنی دوگمەکە بۆ ئەوەی تێک نەچێت و بکەوێتە ناوەڕاست */
+    .stButton > button {
         display: block;
-        margin: 0 auto;
-        width: 50%;
-        font-size: 20px;
+        margin: 20px auto !important;
+        width: 200px !important;
+        height: 50px;
+        font-size: 18px !important;
+        border-radius: 10px;
+        background-color: #007bff;
+        color: white;
     }
     
-    /* بۆکسەکانی ئەنجام (Success/Info) */
+    /* بۆکسەکانی ئەنجام */
     .stAlert {
         direction: rtl;
         text-align: center;
@@ -53,7 +57,7 @@ st.markdown("""
 # ==========================================
 class CalKWh:
     def __init__(self):
-        # نرخەکان لێرە دیاری دەکەین
+        # نرخەکان
         self.prices_home = [72, 108, 172, 260, 350] # نرخەکانی ماڵان
         self.price_business = 185      # بازرگانی
         self.price_large_ind = 125     # پیشەسازی گەورە
@@ -62,8 +66,8 @@ class CalKWh:
         self.price_agri = 60           # کشتوکاڵ
 
     def get_user_input(self):
-        st.title("⚡ حیسابکردنی نرخی کارەبا")
-        st.write("بەخێربێیت **کاک ئامانج**")
+        st.title("⚡ سیستەمی هەژمارکردنی نرخی کارەبا")
+        st.write("بۆ زانینی تێچووی کارەباکەت، زانیارییەکان پڕ بکەرەوە")
         st.write("---")
 
         # وەرگرتنی زانیاری
@@ -72,19 +76,19 @@ class CalKWh:
             ["ماڵان", "بازرگانی", "پیشەسازی گەورە", "پیشەسازی", "میری", "کشتوکاڵ"]
         )
 
-        kwh = st.number_input("بڕی بەکارهێنان (kWh):", min_value=0, step=1)
+        kwh = st.number_input("بڕی بەکارهێنان بە (kWh):", min_value=0, step=1)
         
         return user_type, kwh
 
     def calculate(self):
-        # بانگکردنی فەنکشنی وەرگرتنی زانیاری
+        # وەرگرتنی زانیارییەکان
         user_type, kwh = self.get_user_input()
 
-        # کاتێک دوگمەکە دەگرێت
-        if st.button("حیسابی بکە"):
+        # کاتێک کلیک لەسەر دوگمەی هەژمارکردن دەکرێت
+        if st.button("هەژمارکردن"):
             total_price = 0
             
-            # --- حیساباتی ماڵان ---
+            # --- هەژمارکردنی ماڵان ---
             if user_type == "ماڵان":
                 if kwh <= 400:
                     total_price = kwh * self.prices_home[0]
@@ -100,14 +104,14 @@ class CalKWh:
                                   (400 * self.prices_home[1]) + \
                                   (400 * self.prices_home[2]) + \
                                   ((kwh - 1200) * self.prices_home[3])
-                else: # سەرووی 1600
+                else: 
                     total_price = (400 * self.prices_home[0]) + \
                                   (400 * self.prices_home[1]) + \
                                   (400 * self.prices_home[2]) + \
                                   (400 * self.prices_home[3]) + \
                                   ((kwh - 1600) * self.prices_home[4])
 
-            # --- حیساباتی جۆرەکانی تر ---
+            # --- هەژمارکردنی جۆرەکانی تر ---
             elif user_type == "بازرگانی":
                 total_price = kwh * self.price_business
             
@@ -124,8 +128,9 @@ class CalKWh:
                 total_price = kwh * self.price_agri
 
             # --- نیشاندانی ئەنجام ---
+            st.markdown("---")
             st.success(f"جۆری هاوبەش: {user_type}")
-            st.success(f"💰 کۆی گشتی پارەکە: {total_price:,} دینار")
+            st.success(f"💰 کۆی گشتی پارەکە: **{total_price:,}** دینار")
 
 # ==========================================
 # 3. کارپێکردنی بەرنامەکە
