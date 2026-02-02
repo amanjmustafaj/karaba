@@ -102,14 +102,14 @@ st.markdown("---")
 
 # حیسابکردن و نیشاندان
 if kwh > 0:
-    st.subheader("ئەنجامی حیساب")
+    st.subheader("ئەنجامی هەژمارکردنەکە")
     
     if st.session_state.user_type == 1:
         # ماڵان
         total, details = calc.calculate_home(kwh)
         
         # نیشاندانی وردەکاری
-        st.markdown("#### وردەکاری حیسابەکە:")
+        st.markdown("#### وردەکاری هەژمارکردنەکە:")
         
         counter = 1
         for item in details:
@@ -157,4 +157,5 @@ else:
 
 
 st.caption("سیستەمی هە‌ژمارکردنی نرخی کارەبا")
+
 
