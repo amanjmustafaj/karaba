@@ -1,5 +1,4 @@
 import streamlit as st
-import pandas as pd
 
 # ==========================================
 # 1. ڕێکخستنی دیزاین و سەنتەرکردن (CSS)
@@ -29,11 +28,20 @@ st.markdown("""
         background-color: #007bff;
         color: white;
         font-size: 18px !important;
+        border: none;
+        border-radius: 8px;
     }
-    /* ستایل بۆ خشتەکە */
-    .stDataFrame {
-        margin-left: auto;
-        margin-right: auto;
+    /* ستایل بۆ خشتە دەستکردەکە */
+    .table-header {
+        background-color: #f0f2f6;
+        padding: 10px;
+        border-radius: 5px;
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+    .table-row {
+        padding: 8px;
+        border-bottom: 1px solid #eee;
     }
     </style>
     """, unsafe_allow_html=True)
@@ -52,7 +60,7 @@ class CalKWh:
             "کشتوکاڵ": 60
         }
 
-    def calculate(self):
+    def get_input(self):
         st.title("⚡ سیستەمی هەژمارکردنی نرخی کارەبا")
         st.write("---")
 
@@ -60,11 +68,14 @@ class CalKWh:
             "جۆری هاوبەش هەڵبژێرە:",
             ["ماڵان", "بازرگانی", "پیشەسازی گەورە", "پیشەسازی", "میری", "کشتوکاڵ"]
         )
-
         kwh = st.number_input("بڕی بەکارهێنان بە (kWh):", min_value=0, step=1)
+        return user_type, kwh
+
+    def calculate(self):
+        user_type, kwh = self.get_input()
 
         if st.button("هەژمارکردن"):
-            data_rows = []
+            details = []
             total_price = 0
 
             if user_type == "ماڵان":
@@ -74,26 +85,39 @@ class CalKWh:
                     ("٤٠٠ی دووەم", 400, self.prices_home[1]),
                     ("٤٠٠ی سێیەم", 400, self.prices_home[2]),
                     ("٤٠٠ی چوارەم", 400, self.prices_home[3]),
-                    ("سەرووی ١٦٠٠", float('inf'), self.prices_home[4])
+                    ("سەرووی ١٦٠٠", 999999, self.prices_home[4])
                 ]
 
                 for name, limit, price in tiers:
                     if temp_kwh > 0:
                         used = min(temp_kwh, limit)
                         cost = used * price
-                        data_rows.append({"قۆناغ": name, "بڕ (kWh)": used, "نرخ (دینار)": price, "تێچوو (دینار)": f"{cost:,}"})
+                        details.append({"part": name, "qty": used, "prc": price, "total": cost})
                         total_price += cost
                         temp_kwh -= used
             else:
-                # بۆ جۆرەکانی تر کە نرخەکەیان جێگیرە
                 price = self.flat_prices[user_type]
                 total_price = kwh * price
-                data_rows.append({"جۆر": user_type, "بڕ (kWh)": kwh, "نرخ (دینار)": price, "تێچوو (دینار)": f"{total_price:,}"})
+                details.append({"part": user_type, "qty": kwh, "prc": price, "total": total_price})
 
-            # نیشاندانی ئەنجامەکان بە خشتە
+            # نیشاندانی وردەکاری بە شێوەی خشتە (بە ستوونەکان)
             st.markdown("### 📊 وردەکاری هەژمارکردن")
-            df = pd.DataFrame(data_rows)
-            st.table(df) # بەکارهێنانی st.table بۆ ئەوەی وەک خشتەیەکی جێگیر دەرکەوێت
+            
+            # سەردێڕی خشتە
+            h1, h2, h3, h4 = st.columns(4)
+            with h1: st.markdown("**قۆناغ / جۆر**")
+            with h2: st.markdown("**بڕ (kWh)**")
+            with h3: st.markdown("**نرخ**")
+            with h4: st.markdown("**تێچوو**")
+            st.markdown("---")
+
+            # ڕیزەکانی خشتە
+            for item in details:
+                r1, r2, r3, r4 = st.columns(4)
+                with r1: st.write(item["part"])
+                with r2: st.write(f"{item['qty']:,}")
+                with r3: st.write(f"{item['prc']}")
+                with r4: st.write(f"**{item['total']:,}**")
 
             st.markdown("---")
             st.success(f"💰 کۆی گشتی پارەکە: **{total_price:,}** دینار")
