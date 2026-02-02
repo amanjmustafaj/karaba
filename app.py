@@ -45,7 +45,7 @@ class CalKWH:
 
 
 # ڕێکخستنی پەڕە
-st.set_page_config(page_title="حیسابکردنی کارەبا", layout="centered")
+st.set_page_config(page_title="هەژمارکردنی کارەبا", layout="centered")
 
 # CSS بۆ ناوەڕاستکردنی نووسین
 st.markdown("""
@@ -60,7 +60,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # سەرناو
-st.title("حیسابکردنی نرخی کارەبا")
+st.title("هەژمارکردنی نرخی کارەبا")
 st.markdown("---")
 
 # دروستکردنی کلاس
@@ -155,5 +155,6 @@ if kwh > 0:
 else:
     st.info("تکایە بڕی کارەبا بنووسە بۆ بینینی ئەنجام")
 
-st.markdown("---")
-st.caption("سیستەمی حیسابکردنی نرخی کارەبا - هەرێمی کوردستان")
+
+st.caption("سیستەمی هە‌ژمارکردنی نرخی کارەبا")
+
