@@ -1,126 +1,86 @@
 import streamlit as st
 
-# ڕێکخستنی شێوازی پەڕەکە
-st.set_page_config(page_title="هەژمارکردنی کارەبا", page_icon="⚡")
+# ==========================================
+# بەشی دیزاین (هەر وەک خۆی دامناوەتەوە)
+# ==========================================
+st.set_page_config(page_title="حیسابی کارەبا", page_icon="⚡")
 
-# ستایلی تایبەت بۆ زمانی کوردی (RTL)
 st.markdown("""
     <style>
-    body, div, p, h1, h2, h3, h4, span, label {
+    body, .stApp {
         direction: rtl;
         text-align: right;
         font-family: 'Tahoma', sans-serif;
     }
+    div[data-testid="stVerticalBlock"] {
+        align-items: end;
+    }
     .stSelectbox, .stNumberInput {
         direction: rtl;
-    }
-    /* بۆ ئەوەی خشتەکان جوان دەرکەون */
-    div[data-testid="column"] {
-        background-color: #f0f2f6;
-        padding: 10px;
-        border-radius: 10px;
-        margin: 5px;
-        text-align: center;
     }
     </style>
     """, unsafe_allow_html=True)
 
-class CalKWh:
-    def __init__(self):
-        # نرخی ماڵان (قۆناغ بە قۆناغ)
-        self.home_prices = {
-            "tier1": 72,   # 1 - 400
-            "tier2": 108,  # 401 - 800
-            "tier3": 172,  # 801 - 1200
-            "tier4": 260,  # 1201 - 1600
-            "tier5": 350   # > 1600
-        }
-        
-        # نرخی شوێنەکانی تر (جێگیر)
-        self.flat_prices = {
-            "بازرگانی": 185,
-            "پیشەسازی گەورە": 125,
-            "پیشەسازی": 160,
-            "میری (حکومی)": 160,
-            "کشتوکاڵ": 60
-        }
+# ==========================================
+# بەشی بەرنامەکە (بەبێ Class - زۆر سادە)
+# ==========================================
 
-    def run_app(self):
-        st.title(" سیستەمی زیرەکی هەژمارکردنی کارەبا")
-        st.write("بەخێربێیت ، جۆری هاوبەش هەڵبژێرە بۆ هەژمارکردنی.")
+st.title("⚡ حیسابکردنی نرخی کارەبا")
+st.write("بەخێربێیت **کاک ئامانج**، تکایە زانیارییەکان پڕ بکەرەوە:")
 
-        # دروستکردنی لیستی هەڵبژاردن
-        options = ["ماڵان"] + list(self.flat_prices.keys())
-        user_type = st.selectbox("جۆری بەکارهێنەر هەڵبژێرە:", options)
+# ١. هەڵبژاردنی جۆر
+jori_hawbash = st.selectbox(
+    "جۆری هاوبەش هەڵبژێرە:",
+    ["ماڵان", "بازرگانی", "پیشەسازی گەورە", "پیشەسازی", "میری", "کشتوکاڵ"]
+)
 
-        kwh = st.number_input("بڕی بەکارهێنان بە (kWh) بنووسە:", min_value=0, step=1)
+# ٢. وەرگرتنی بڕی کارەبا
+kwh = st.number_input("بڕی بەکارهێنان (kWh):", min_value=0, step=1)
 
-        if st.button("هەژمارکردنی بکە "):
-            if kwh == 0:
-                st.warning("تکایە بڕی کارەبا بنووسە!")
-            elif user_type == "ماڵان":
-                self.calculate_home(kwh)
-            else:
-                self.calculate_flat(user_type, kwh)
+# ٣. دوگمەی حیسابکردن
+if st.button("حیسابی بکە"):
+    
+    total_price = 0  # کۆی پارەکە
 
-    def calculate_flat(self, u_type, kwh):
-        price = self.flat_prices[u_type]
-        total = kwh * price
-        st.success(f"جۆری بەکارهێنەر: **{u_type}**")
-        st.info(f"نرخی یەکەیەک: {price} دینار")
-        st.metric(label="کۆی گشتی پارەکە", value=f"{total:,} دینار")
+    # ---- ئەگەر ماڵان بوو (بە قادرمە) ----
+    if jori_hawbash == "ماڵان":
+        if kwh <= 400:
+            total_price = kwh * 72
+        elif kwh <= 800:
+            total_price = (400 * 72) + ((kwh - 400) * 108)
+        elif kwh <= 1200:
+            total_price = (400 * 72) + (400 * 108) + ((kwh - 800) * 172)
+        elif kwh <= 1600:
+            total_price = (400 * 72) + (400 * 108) + (400 * 172) + ((kwh - 1200) * 260)
+        else: # سەرووی ١٦٠٠
+            total_price = (400 * 72) + (400 * 108) + (400 * 172) + (400 * 260) + ((kwh - 1600) * 350)
+            
+        st.info("نرخەکانی ماڵان: (72 - 108 - 172 - 260 - 350)")
 
-    def calculate_home(self, kwh):
-        total = 0
-        remaining_kwh = kwh
-        breakdown = [] # بۆ هەڵگرتنی وردەکارییەکان
+    # ---- ئەگەر بازرگانی بوو ----
+    elif jori_hawbash == "بازرگانی":
+        total_price = kwh * 185
+        st.info("نرخی بازرگانی جێگیرە: 185 دینار")
 
-        # قۆناغی یەکەم (1-400)
-        if remaining_kwh > 0:
-            amount = min(remaining_kwh, 400)
-            cost = amount * self.home_prices["tier1"]
-            total += cost
-            breakdown.append(f"400 ــی یەکەم: {amount} * {self.home_prices['tier1']} = {cost:,}")
-            remaining_kwh -= amount
+    # ---- ئەگەر پیشەسازی گەورە بوو ----
+    elif jori_hawbash == "پیشەسازی گەورە":
+        total_price = kwh * 125
+        st.info("نرخی پیشەسازی گەورە: 125 دینار")
 
-        # قۆناغی دووەم (401-800)
-        if remaining_kwh > 0:
-            amount = min(remaining_kwh, 400)
-            cost = amount * self.home_prices["tier2"]
-            total += cost
-            breakdown.append(f"400 ــی دووەم: {amount} * {self.home_prices['tier2']} = {cost:,}")
-            remaining_kwh -= amount
+    # ---- ئەگەر پیشەسازی بوو ----
+    elif jori_hawbash == "پیشەسازی":
+        total_price = kwh * 160
+        st.info("نرخی پیشەسازی: 160 دینار")
 
-        # قۆناغی سێیەم (801-1200) - نرخ 172
-        if remaining_kwh > 0:
-            amount = min(remaining_kwh, 400)
-            cost = amount * self.home_prices["tier3"]
-            total += cost
-            breakdown.append(f"400 ــی سێیەم: {amount} * {self.home_prices['tier3']} = {cost:,}")
-            remaining_kwh -= amount
+    # ---- ئەگەر میری بوو ----
+    elif jori_hawbash == "میری":
+        total_price = kwh * 160
+        st.info("نرخی میری: 160 دینار")
 
-        # قۆناغی چوارەم (1201-1600) - نرخ 260
-        if remaining_kwh > 0:
-            amount = min(remaining_kwh, 400)
-            cost = amount * self.home_prices["tier4"]
-            total += cost
-            breakdown.append(f"400 ــی چوارەم: {amount} * {self.home_prices['tier4']} = {cost:,}")
-            remaining_kwh -= amount
+    # ---- ئەگەر کشتوکاڵ بوو ----
+    elif jori_hawbash == "کشتوکاڵ":
+        total_price = kwh * 60
+        st.info("نرخی کشتوکاڵ: 60 دینار")
 
-        # قۆناغی پێنجەم (سەرووی 1600) - نرخ 350
-        if remaining_kwh > 0:
-            cost = remaining_kwh * self.home_prices["tier5"]
-            total += cost
-            breakdown.append(f"سەرووی 1600: {remaining_kwh} * {self.home_prices['tier5']} = {cost:,}")
-
-        # نیشاندانی ئەنجامەکان
-        st.success("وردەکاری هەژمارکردنی ماڵان:")
-        for line in breakdown:
-            st.text(line)
-        
-        st.markdown("---")
-        st.metric(label="کۆی گشتی پارەکە", value=f"{total:,} دینار")
-
-if __name__ == "__main__":
-    app = CalKWh()
-    app.run_app()
+    # ---- نیشاندانی ئەنجامی کۆتایی ----
+    st.success(f"💰 کۆی گشتی پارەکە دەکاتە: **{total_price:,}** دینار")
