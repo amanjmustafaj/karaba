@@ -1,18 +1,18 @@
 import streamlit as st
 
-class ژمێریارییکارەبا:
+class ElectricityCalculator:
     """کلاسێک بۆ ژمێرینی نرخی کارەبا"""
     
     def __init__(self):
         # نرخەکانی کارەبای ماڵان (دینار بۆ هەر kWh)
-        self.نرخی_نزم = 72        # بۆ 0-400 kWh
-        self.نرخی_مامناوەند = 108  # بۆ 401-800 kWh
-        self.نرخی_بەرز = 175       # بۆ زیاتر لە 800 kWh
+        self.low_price = 72        # بۆ 0-400 kWh
+        self.mid_price = 108  # بۆ 401-800 kWh
+        self.high_price = 175       # بۆ زیاتر لە 800 kWh
         
         # نرخی کارەبای بازرگانی
-        self.نرخی_بازرگانی = 150
+        self.business_price = 150
     
-    def حیسابی_ماڵان(self, kwh):
+    def calculate_home(self, kwh):
         """
         ژمێرینی نرخی کارەبای ماڵان
         
@@ -22,72 +22,72 @@ class ژمێریارییکارەبا:
         گەڕاندنەوە:
             فەرهەنگێک کە کۆی گشتی و وردەکاریەکانی تێدایە
         """
-        وردەکاری = []
+        details = []
         
         if kwh <= 400:
             # هەموو بڕەکە بە نرخی نزم حیساب دەکرێت
-            کۆ = kwh * self.نرخی_نزم
-            وردەکاری.append({
-                'بەش': 'بەشی یەکەم',
-                'بڕ': kwh,
-                'نرخ': self.نرخی_نزم,
-                'کۆ': کۆ
+            total = kwh * self.low_price
+            details.append({
+                'section': 'بەشی یەکەم',
+                'amount': kwh,
+                'price': self.low_price,
+                'cost': total
             })
             
         elif kwh <= 800:
             # 400 کیلۆواتی یەکەم بە نرخی نزم
-            بەشی_یەکەم = 400 * self.نرخی_نزم
-            وردەکاری.append({
-                'بەش': 'بەشی یەکەم',
-                'بڕ': 400,
-                'نرخ': self.نرخی_نزم,
-                'کۆ': بەشی_یەکەم
+            part1 = 400 * self.low_price
+            details.append({
+                'section': 'بەشی یەکەم',
+                'amount': 400,
+                'price': self.low_price,
+                'cost': part1
             })
             
             # بڕی ماوە بە نرخی مامناوەند
-            بەشی_دووەم = (kwh - 400) * self.نرخی_مامناوەند
-            وردەکاری.append({
-                'بەش': 'بەشی دووەم',
-                'بڕ': kwh - 400,
-                'نرخ': self.نرخی_مامناوەند,
-                'کۆ': بەشی_دووەم
+            part2 = (kwh - 400) * self.mid_price
+            details.append({
+                'section': 'بەشی دووەم',
+                'amount': kwh - 400,
+                'price': self.mid_price,
+                'cost': part2
             })
             
-            کۆ = بەشی_یەکەم + بەشی_دووەم
+            total = part1 + part2
             
         else:
             # 400 کیلۆواتی یەکەم بە نرخی نزم
-            بەشی_یەکەم = 400 * self.نرخی_نزم
-            وردەکاری.append({
-                'بەش': 'بەشی یەکەم (0-400 kWh)',
-                'بڕ': 400,
-                'نرخ': self.نرخی_نزم,
-                'کۆ': بەشی_یەکەم
+            part1 = 400 * self.low_price
+            details.append({
+                'section': 'بەشی یەکەم (0-400 kWh)',
+                'amount': 400,
+                'price': self.low_price,
+                'cost': part1
             })
             
             # 400 کیلۆواتی دووەم بە نرخی مامناوەند
-            بەشی_دووەم = 400 * self.نرخی_مامناوەند
-            وردەکاری.append({
-                'بەش': 'بەشی دووەم (401-800 kWh)',
-                'بڕ': 400,
-                'نرخ': self.نرخی_مامناوەند,
-                'کۆ': بەشی_دووەم
+            part2 = 400 * self.mid_price
+            details.append({
+                'section': 'بەشی دووەم (401-800 kWh)',
+                'amount': 400,
+                'price': self.mid_price,
+                'cost': part2
             })
             
             # بڕی ماوە بە نرخی بەرز
-            بەشی_سێیەم = (kwh - 800) * self.نرخی_بەرز
-            وردەکاری.append({
-                'بەش': 'بەشی سێیەم (زیاتر لە 800 kWh)',
-                'بڕ': kwh - 800,
-                'نرخ': self.نرخی_بەرز,
-                'کۆ': بەشی_سێیەم
+            part3 = (kwh - 800) * self.high_price
+            details.append({
+                'section': 'بەشی سێیەم (زیاتر لە 800 kWh)',
+                'amount': kwh - 800,
+                'price': self.high_price,
+                'cost': part3
             })
             
-            کۆ = بەشی_یەکەم + بەشی_دووەم + بەشی_سێیەم
+            total = part1 + part2 + part3
         
-        return {'کۆی_گشتی': کۆ, 'وردەکاری': وردەکاری}
+        return {'total': total, 'details': details}
     
-    def حیسابی_بازرگانی(self, kwh):
+    def calculate_business(self, kwh):
         """
         ژمێرینی نرخی کارەبای بازرگانی
         
@@ -97,38 +97,37 @@ class ژمێریارییکارەبا:
         گەڕاندنەوە:
             فەرهەنگێک کە کۆی گشتی و وردەکاریەکانی تێدایە
         """
-        کۆ = kwh * self.نرخی_بازرگانی
-        وردەکاری = [{
-            'بەش': 'کارەبای بازرگانی',
-            'بڕ': kwh,
-            'نرخ': self.نرخی_بازرگانی,
-            'کۆ': کۆ
+        total = kwh * self.business_price
+        details = [{
+            'section': 'کارەبای بازرگانی',
+            'amount': kwh,
+            'price': self.business_price,
+            'cost': total
         }]
         
-        return {'کۆی_گشتی': کۆ, 'وردەکاری': وردەکاری}
+        return {'total': total, 'details': details}
 
 
-def سەرەکی():
+def main():
     """فەنکشنی سەرەکی بۆ ڕێکخستنی ڕووکاری بەکارهێنەر"""
     
     # ڕێکخستنی پەڕە
     st.set_page_config(
         page_title="ژمێریاری کارەبا",
-        page_icon="⚡",
         layout="centered"
     )
     
     # سەرناو
-    st.title("⚡ سیستەمی ژمێرینی نرخی کارەبا")
+    st.title("سیستەمی ژمێرینی نرخی کارەبا")
     st.markdown("---")
     
     # دروستکردنی ژمێریار
-    ژمێریار = ژمێریارییکارەبا()
+    calculator = ElectricityCalculator()
     
     # بەشی هەڵبژاردنی جۆری بەکارهێنەر
     st.subheader("١. جۆری بەکارهێنەر هەڵبژێرە")
     
-    جۆری_بەکارهێنەر = st.radio(
+    user_type = st.radio(
         "تکایە جۆری بەکارهێنەرت هەڵبژێرە:",
         options=['ماڵان', 'بازرگانی'],
         horizontal=True,
@@ -140,7 +139,7 @@ def سەرەکی():
     # بەشی نووسینی بڕی کارەبا
     st.subheader("٢. بڕی کارەبای بەکارهاتوو بنووسە")
     
-    بڕی_کارەبا = st.number_input(
+    kwh_amount = st.number_input(
         "بڕی کارەبا بە کیلۆوات کاتژمێر (kWh):",
         min_value=0,
         max_value=100000,
@@ -152,41 +151,50 @@ def سەرەکی():
     st.markdown("---")
     
     # نیشاندانی ئەنجام
-    if بڕی_کارەبا > 0:
+    if kwh_amount > 0:
         st.subheader("٣. ئەنجامی ژمێریاری")
         
         # ژمێرینی نرخ بەپێی جۆری بەکارهێنەر
-        if جۆری_بەکارهێنەر == 'ماڵان':
-            ئەنجام = ژمێریار.حیسابی_ماڵان(بڕی_کارەبا)
+        if user_type == 'ماڵان':
+            result = calculator.calculate_home(kwh_amount)
             
             # نیشاندانی وردەکاری
-            if len(ئەنجام['وردەکاری']) > 1:
-                st.info("📊 **وردەکاری ژمێریاریەکە:**")
+            if len(result['details']) > 1:
+                st.info("**وردەکاری ژمێریاریەکە:**")
                 
-                for بەش in ئەنجام['وردەکاری']:
+                for section in result['details']:
                     with st.container():
                         col1, col2, col3 = st.columns([2, 2, 2])
                         with col1:
-                            st.write(f"**{بەش['بەش']}**")
+                            st.write(f"**{section['section']}**")
                         with col2:
-                            st.write(f"{بەش['بڕ']:,} kWh × {بەش['نرخ']} دینار")
+                            st.write(f"{section['amount']:,} kWh × {section['price']} دینار")
                         with col3:
-                            st.write(f"**{بەش['کۆ']:,} دینار**")
+                            st.write(f"**{section['cost']:,} دینار**")
                 
                 st.markdown("---")
         
         else:  # بازرگانی
-            ئەنجام = ژمێریار.حیسابی_بازرگانی(بڕی_کارەبا)
+            result = calculator.calculate_business(kwh_amount)
             
-            st.info(f"📊 **ژمێریاری:** {بڕی_کارەبا:,} kWh × {ژمێریار.نرخی_بازرگانی} دینار")
+            st.info("**وردەکاری ژمێریاریەکە:**")
+            with st.container():
+                col1, col2, col3 = st.columns([2, 2, 2])
+                with col1:
+                    st.write(f"**کارەبای بازرگانی**")
+                with col2:
+                    st.write(f"{kwh_amount:,} kWh × {calculator.business_price} دینار")
+                with col3:
+                    st.write(f"**{result['total']:,} دینار**")
+            
             st.markdown("---")
         
         # نیشاندانی کۆی گشتی
-        st.success(f"### 💰 کۆی گشتی: **{ئەنجام['کۆی_گشتی']:,} دینار عێراقی**")
+        st.success(f"### کۆی گشتی: **{result['total']:,} دینار عێراقی**")
         
         # زانیاریی زیادە
-        with st.expander("ℹ️ زانیاریی زیادە"):
-            if جۆری_بەکارهێنەر == 'ماڵان':
+        with st.expander("زانیاریی زیادە"):
+            if user_type == 'ماڵان':
                 st.markdown("""
                 **نرخەکانی کارەبای ماڵان:**
                 - بۆ 0-400 kWh: 72 دینار بۆ هەر kWh
@@ -200,13 +208,13 @@ def سەرەکی():
                 """)
     
     else:
-        st.info("👆 تکایە بڕی کارەبای بەکارهاتوو بنووسە بۆ بینینی ئەنجام")
+        st.info("تکایە بڕی کارەبای بەکارهاتوو بنووسە بۆ بینینی ئەنجام")
     
     # پێی پەڕە
     st.markdown("---")
-    st.caption("🔌 سیستەمی ژمێرینی نرخی کارەبا - هەرێمی کوردستان")
+    st.caption("سیستەمی ژمێرینی نرخی کارەبا - هەرێمی کوردستان")
 
 
 # جێبەجێکردنی پرۆگرامەکە
 if __name__ == "__main__":
-    سەرەکی()
+    main()
