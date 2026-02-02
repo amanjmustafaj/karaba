@@ -69,13 +69,23 @@ calc = CalKWH()
 # هەڵبژاردنی جۆر
 st.subheader("جۆری بەکارهێنەر")
 
+# دوو دوگمە بۆ هەڵبژاردن
+col1, col2 = st.columns(2)
+with col1:
+    if st.button("ماڵان", use_container_width=True):
+        st.session_state.user_type = 1
+with col2:
+    if st.button("بازرگانی", use_container_width=True):
+        st.session_state.user_type = 2
 
-user_type = st.radio(
-    "جۆر هەڵبژێرە:", 
-    [1, 2], 
-    format_func=lambda x: "ماڵان" if x == 1 else "بازرگانی",
-    horizontal=True
-)
+# هەڵبژاردنی ئێستا نیشان بدە
+if 'user_type' not in st.session_state:
+    st.session_state.user_type = 1
+
+if st.session_state.user_type == 1:
+    st.info("هەڵبژاردراو: ماڵان")
+else:
+    st.info("هەڵبژاردراو: بازرگانی")
 
 st.markdown("---")
 
@@ -94,21 +104,28 @@ st.markdown("---")
 if kwh > 0:
     st.subheader("ئەنجامی حیساب")
     
-    if user_type == 1:
+    if st.session_state.user_type == 1:
         # ماڵان
         total, details = calc.calculate_home(kwh)
         
         # نیشاندانی وردەکاری
         st.markdown("#### وردەکاری حیسابەکە:")
         
-        for i, (amount, price, cost) in enumerate(details, 1):
+        counter = 1
+        for item in details:
+            amount = item[0]
+            price = item[1]
+            cost = item[2]
+            
             col1, col2, col3 = st.columns([2, 2, 2])
             with col1:
-                st.write(f"**بەشی {i}**")
+                st.write(f"**بەشی {counter}**")
             with col2:
                 st.write(f"{amount:,} kWh × {price} دینار")
             with col3:
                 st.write(f"**{cost:,} دینار**")
+            
+            counter = counter + 1
         
         st.markdown("---")
         st.success(f"### کۆی گشتی: **{total:,} دینار**")
@@ -119,7 +136,11 @@ if kwh > 0:
         
         st.markdown("#### وردەکاری حیسابەکە:")
         
-        amount, price, cost = details[0]
+        item = details[0]
+        amount = item[0]
+        price = item[1]
+        cost = item[2]
+        
         col1, col2, col3 = st.columns([2, 2, 2])
         with col1:
             st.write("**کارەبای بازرگانی**")
