@@ -47,6 +47,18 @@ class CalKWH:
 # ڕێکخستنی پەڕە
 st.set_page_config(page_title="حیسابکردنی کارەبا", layout="centered")
 
+# CSS بۆ ناوەڕاستکردنی نووسین
+st.markdown("""
+<style>
+    .stApp {
+        direction: rtl;
+    }
+    div[data-testid="column"] {
+        text-align: center;
+    }
+</style>
+""", unsafe_allow_html=True)
+
 # سەرناو
 st.title("حیسابکردنی نرخی کارەبا")
 st.markdown("---")
@@ -124,4 +136,3 @@ else:
 
 st.markdown("---")
 st.caption("سیستەمی حیسابکردنی نرخی کارەبا - هەرێمی کوردستان")
-
