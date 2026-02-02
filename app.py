@@ -27,7 +27,7 @@ class calkwh:
             if st.button("حیساب بکە"):
                 if self.kwh <= 400: 
                     kwh1 = (self.kwh * self.low_price)
-                    st.success(f"rezhay bakar henani karab {self.kwh}kwh a koe gshte dakata {kwh1:,}")
+                    st.success(f"⚡ بڕی بەکارهێنان: {self.kwh} kWh | 💰 کۆی گشتی پارەی کارەبا: {kwh1:,} دینار")
                 elif self.kwh <= 800:
                     kwh1 = (400 * self.low_price) 
                     kwh2 = (self.kwh - 400) * self.mid_price
@@ -61,4 +61,5 @@ if __name__ == "__main__":
     k = calkwh()
 
     k.calculate_kwh()
+
 
