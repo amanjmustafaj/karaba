@@ -13,12 +13,20 @@ st.markdown("""
         text-align: center !important; width: 100%; font-size: 18px; font-weight: bold;
     }
     
+    /* ستایلی باکگراوندی لیستی هەڵبژاردن کاتێک دەکرێتەوە */
+    div[data-baseweb="popover"] {
+        background-color: #EAEFEF !important;
+    }
+    div[data-baseweb="listbox"] {
+        background-color: #EAEFEF !important;
+    }
+
     /* ستایلی دوگمەکە */
     .stButton > button {
         display: block; margin: 10px auto !important; width: 280px !important;
         height: 60px; color: white !important; font-size: 20px !important;
         border: none; border-radius: 12px; font-weight: bold;
-        background-color: #ACBFA4 !important; /* ڕەنگی نوێ لێرە دانرا */
+        background-color: #ACBFA4 !important; 
         transition: background-color 0.2s ease;
     }
     
