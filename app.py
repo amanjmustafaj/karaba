@@ -122,9 +122,17 @@ class ElectricityCalculator:
             st.markdown("---")
             st.success(f"### کۆی گشتی: {total_cost:,} دینار")
             
+            # خەت و زانیاری نرخەکان
+            st.markdown("---")
+            self.show_price_info()
+            
         else:
             total_cost = kwh * self.flat_rates[category]
             st.success(f"### کۆی گشتی: {total_cost:,} دینار")
+            
+            # خەت و زانیاری نرخەکان
+            st.markdown("---")
+            self.show_price_info()
 
     def calculate_units(self, category, money):
         """دینار دەگۆڕێت بۆ kWh"""
@@ -149,6 +157,51 @@ class ElectricityCalculator:
             total_units = money / self.flat_rates[category]
 
         st.info(f"### بڕی کارەبا: {round(total_units, 2):,} kWh")
+        
+        # خەت و زانیاری نرخەکان
+        st.markdown("---")
+        self.show_price_info()
+
+    def show_price_info(self):
+        """پیشاندانی زانیاری نرخەکان بۆ هەموو جۆرەکان"""
+        st.write("### نرخەکانی کارەبا:")
+        st.write("")
+        
+        # ماڵان
+        with st.container():
+            st.write("**ماڵان:**")
+            col1, col2, col3, col4, col5 = st.columns(5)
+            with col1:
+                st.write("یەکەم 400")
+                st.write("72 دینار")
+            with col2:
+                st.write("دووەم 400")
+                st.write("108 دینار")
+            with col3:
+                st.write("سێیەم 400")
+                st.write("172 دینار")
+            with col4:
+                st.write("چوارەم 400")
+                st.write("260 دینار")
+            with col5:
+                st.write("زیاتر")
+                st.write("350 دینار")
+        
+        st.write("")
+        
+        # کاتیگۆرییەکانی دیکە
+        col1, col2, col3 = st.columns(3)
+        
+        with col1:
+            st.write("**بازرگانی:** 185 دینار/kWh")
+            st.write("**پیشەسازی:** 160 دینار/kWh")
+        
+        with col2:
+            st.write("**میری:** 160 دینار/kWh")
+            st.write("**کشتوکاڵ:** 60 دینار/kWh")
+        
+        with col3:
+            st.write("**پیشەسازی گەورە:** 125 دینار/kWh")
 
 if __name__ == "__main__":
     app = ElectricityCalculator()
