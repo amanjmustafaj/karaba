@@ -1,5 +1,4 @@
 import streamlit as st
-import pandas as pd
 
 # Page configuration
 st.set_page_config(
@@ -148,7 +147,7 @@ with st.sidebar:
     
     page = st.radio(
         "هەڵبژاردنی لاپەڕە",
-        ["🧮 حیسابی نرخ", "⚙️ حیسابی تەکنیکی", "💡 زانیاری و ئامێرەکان", "⚙️ ڕێکخستن"],
+        ["🧮 حیسابی نرخ", "⚙️ حیسابی تەکنیکی", "💡 زانیاری و ئامێرەکان", "📱 دەربارە"],
         label_visibility="collapsed"
     )
     
@@ -209,10 +208,44 @@ if page == "🧮 حیسابی نرخ":
                     total_cost += cost
                     remaining -= used
                 
-                # Display tier breakdown
+                # Display tier breakdown with modern HTML table
                 st.markdown("### 📊 وردەکاری پلەکان")
-                df = pd.DataFrame(tier_details)
-                st.dataframe(df, use_container_width=True, hide_index=True)
+                
+                table_html = """
+                <div style="overflow-x: auto; margin: 1rem 0;">
+                    <table style="width: 100%; border-collapse: separate; border-spacing: 0; 
+                                  background: white; border-radius: 15px; overflow: hidden; 
+                                  box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
+                        <thead>
+                            <tr style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                                <th style="padding: 1rem; text-align: center; font-weight: bold;">پلە</th>
+                                <th style="padding: 1rem; text-align: center; font-weight: bold;">بڕی بەکارهاتوو</th>
+                                <th style="padding: 1rem; text-align: center; font-weight: bold;">نرخ</th>
+                                <th style="padding: 1rem; text-align: center; font-weight: bold;">کۆی تێچوو</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                """
+                
+                for i, detail in enumerate(tier_details):
+                    bg_color = "#f8f9fa" if i % 2 == 0 else "white"
+                    table_html += f"""
+                        <tr style="background: {bg_color};">
+                            <td style="padding: 0.8rem; text-align: center; border-bottom: 1px solid #e0e0e0;">{detail['پلە']}</td>
+                            <td style="padding: 0.8rem; text-align: center; border-bottom: 1px solid #e0e0e0;">{detail['بڕی بەکارهاتوو']} kWh</td>
+                            <td style="padding: 0.8rem; text-align: center; border-bottom: 1px solid #e0e0e0;">{detail['نرخ']} دینار</td>
+                            <td style="padding: 0.8rem; text-align: center; font-weight: bold; 
+                                       color: #667eea; border-bottom: 1px solid #e0e0e0;">{detail['کۆی تێچوو']} دینار</td>
+                        </tr>
+                    """
+                
+                table_html += """
+                        </tbody>
+                    </table>
+                </div>
+                """
+                
+                st.markdown(table_html, unsafe_allow_html=True)
                 
                 # Display total
                 st.markdown(f"""
@@ -380,64 +413,241 @@ elif page == "💡 زانیاری و ئامێرەکان":
     st.markdown("---")
     st.markdown("### 📊 خشتەی نرخەکان بەپێی وێنەی فەرمی")
     
-    price_data = {
-        "جۆر": [
-            "ماڵان (0-400)",
-            "ماڵان (401-800)",
-            "ماڵان (801-1200)",
-            "ماڵان (1201-1600)",
-            "ماڵان (1600+)",
-            "بازرگانی",
-            "پیشەسازی",
-            "پیشەسازی گەورە",
-            "میری",
-            "کشتوکاڵ"
-        ],
-        "نرخ (دینار)": [72, 108, 175, 265, 350, 185, 160, 125, 160, 60]
-    }
+    price_table_html = """
+    <div style="overflow-x: auto; margin: 1rem 0;">
+        <table style="width: 100%; border-collapse: separate; border-spacing: 0; 
+                      background: white; border-radius: 15px; overflow: hidden; 
+                      box-shadow: 0 8px 20px rgba(0,0,0,0.12);">
+            <thead>
+                <tr style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white;">
+                    <th style="padding: 1rem; text-align: center; font-weight: bold; font-size: 1.1rem;">جۆری بەکارهێنەر</th>
+                    <th style="padding: 1rem; text-align: center; font-weight: bold; font-size: 1.1rem;">نرخ (دینار)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr style="background: #f8f9fa;">
+                    <td style="padding: 0.9rem; text-align: center; border-bottom: 1px solid #e0e0e0; font-weight: 500;">ماڵان (0-400)</td>
+                    <td style="padding: 0.9rem; text-align: center; border-bottom: 1px solid #e0e0e0; color: #667eea; font-weight: bold;">72</td>
+                </tr>
+                <tr style="background: white;">
+                    <td style="padding: 0.9rem; text-align: center; border-bottom: 1px solid #e0e0e0; font-weight: 500;">ماڵان (401-800)</td>
+                    <td style="padding: 0.9rem; text-align: center; border-bottom: 1px solid #e0e0e0; color: #667eea; font-weight: bold;">108</td>
+                </tr>
+                <tr style="background: #f8f9fa;">
+                    <td style="padding: 0.9rem; text-align: center; border-bottom: 1px solid #e0e0e0; font-weight: 500;">ماڵان (801-1200)</td>
+                    <td style="padding: 0.9rem; text-align: center; border-bottom: 1px solid #e0e0e0; color: #667eea; font-weight: bold;">175</td>
+                </tr>
+                <tr style="background: white;">
+                    <td style="padding: 0.9rem; text-align: center; border-bottom: 1px solid #e0e0e0; font-weight: 500;">ماڵان (1201-1600)</td>
+                    <td style="padding: 0.9rem; text-align: center; border-bottom: 1px solid #e0e0e0; color: #667eea; font-weight: bold;">265</td>
+                </tr>
+                <tr style="background: #f8f9fa;">
+                    <td style="padding: 0.9rem; text-align: center; border-bottom: 1px solid #e0e0e0; font-weight: 500;">ماڵان (1600+)</td>
+                    <td style="padding: 0.9rem; text-align: center; border-bottom: 1px solid #e0e0e0; color: #667eea; font-weight: bold;">350</td>
+                </tr>
+                <tr style="background: white;">
+                    <td style="padding: 0.9rem; text-align: center; border-bottom: 1px solid #e0e0e0; font-weight: 500;">بازرگانی</td>
+                    <td style="padding: 0.9rem; text-align: center; border-bottom: 1px solid #e0e0e0; color: #fa709a; font-weight: bold;">185</td>
+                </tr>
+                <tr style="background: #f8f9fa;">
+                    <td style="padding: 0.9rem; text-align: center; border-bottom: 1px solid #e0e0e0; font-weight: 500;">پیشەسازی</td>
+                    <td style="padding: 0.9rem; text-align: center; border-bottom: 1px solid #e0e0e0; color: #fa709a; font-weight: bold;">160</td>
+                </tr>
+                <tr style="background: white;">
+                    <td style="padding: 0.9rem; text-align: center; border-bottom: 1px solid #e0e0e0; font-weight: 500;">پیشەسازی گەورە</td>
+                    <td style="padding: 0.9rem; text-align: center; border-bottom: 1px solid #e0e0e0; color: #fa709a; font-weight: bold;">125</td>
+                </tr>
+                <tr style="background: #f8f9fa;">
+                    <td style="padding: 0.9rem; text-align: center; border-bottom: 1px solid #e0e0e0; font-weight: 500;">میری</td>
+                    <td style="padding: 0.9rem; text-align: center; border-bottom: 1px solid #e0e0e0; color: #43e97b; font-weight: bold;">160</td>
+                </tr>
+                <tr style="background: white;">
+                    <td style="padding: 0.9rem; text-align: center; font-weight: 500;">کشتوکاڵ</td>
+                    <td style="padding: 0.9rem; text-align: center; color: #43e97b; font-weight: bold;">60</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    """
     
-    df_prices = pd.DataFrame(price_data)
-    st.dataframe(df_prices, use_container_width=True, hide_index=True)
+    st.markdown(price_table_html, unsafe_allow_html=True)
 
-# ===== PAGE 4: Settings =====
+# ===== PAGE 4: About/Info =====
 else:
-    st.markdown("## ⚙️ ڕێکخستن")
+    st.markdown("## 📱 دەربارەی ئەپڵیکەیشن")
     
-    st.markdown("### 🎨 ڕێکخستنی شاشە")
+    # Hero Section
+    st.markdown("""
+    <div class="custom-card">
+        <h1 style="color: white; text-align: center; font-size: 2.5rem; margin-bottom: 0;">⚡ سیستەمی کارەبا</h1>
+        <p style="text-align: center; font-size: 1.2rem; margin-top: 0.5rem; color: rgba(255,255,255,0.9);">
+            ئەپڵیکەیشنێکی پیشەیی بۆ حیسابکردنی کارەبا
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
     
-    theme = st.radio(
-        "هەڵبژاردنی ڕووکار",
-        ["☀️ ڕووناک", "🌙 تاریک", "⚙️ سیستەم"],
-        label_visibility="collapsed"
-    )
+    st.markdown("<br>", unsafe_allow_html=True)
     
-    st.markdown("---")
+    # Features in columns
+    col1, col2 = st.columns(2)
     
-    st.markdown("### ℹ️ دەربارەی ئەپڵیکەیشن")
-    st.info("""
-    **سیستەمی کارەبا**
+    with col1:
+        st.markdown("""
+        <div class="info-card">
+            <h3 style="color: white;">💰 حیسابی نرخ</h3>
+            <p style="color: rgba(255,255,255,0.9);">
+            حیسابکردنی نرخی کارەبا بەپێی سیستەمی پلەبەندی بۆ ماڵان و نرخی جیاواز بۆ بازرگانی، پیشەسازی، میری و کشتوکاڵ
+            </p>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        st.markdown("""
+        <div class="info-card" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">
+            <h3 style="color: white;">💡 زانیاری ئامێرەکان</h3>
+            <p style="color: rgba(255,255,255,0.9);">
+            زانیاری تەواو دەربارەی بڕی بەکارهێنانی ئامێرە کارەباییەکان و حیسابکردنی کۆی وات و ئەمپێر
+            </p>
+        </div>
+        """, unsafe_allow_html=True)
     
-    وەشانی 1.0.7
+    with col2:
+        st.markdown("""
+        <div class="info-card" style="background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);">
+            <h3 style="color: #333;">⚙️ حیسابی تەکنیکی</h3>
+            <p style="color: #555;">
+            گۆڕینی یەکەکان: وات بۆ کیلۆوات، وات بۆ ئەمپێر، ئەمپێر بۆ کیلۆوات و حیسابکردنی بەکارهێنانی مانگانە
+            </p>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        st.markdown("""
+        <div class="info-card" style="background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);">
+            <h3 style="color: #333;">📊 خشتەی نرخەکان</h3>
+            <p style="color: #555;">
+            خشتەی تەواوی نرخەکانی کارەبا بەپێی جۆری بەکارهێنەر و وردەکاری پلەبەندی بۆ ماڵان
+            </p>
+        </div>
+        """, unsafe_allow_html=True)
     
-    گەشەپێدەر: AMANJ
+    st.markdown("<br>", unsafe_allow_html=True)
     
-    ئەم ئەپڵیکەیشنە بۆ حیسابکردنی نرخی کارەبا و زانیاری تەکنیکی دروستکراوە.
-    """)
+    # Statistics Section
+    st.markdown("### 📊 ئامارەکان")
     
-    st.markdown("---")
+    stats_col1, stats_col2, stats_col3 = st.columns(3)
     
-    st.markdown("### 🔧 تایبەتمەندیەکان")
-    st.success("""
-    ✅ حیسابکردنی نرخ بەپێی جۆری بەکارهێنەر
+    with stats_col1:
+        st.markdown("""
+        <div class="metric-card" style="text-align: center; border-left: 4px solid #667eea;">
+            <h1 style="color: #667eea; margin: 0;">17+</h1>
+            <p style="color: #888; margin: 0.5rem 0 0 0;">ئامێری کارەبایی</p>
+        </div>
+        """, unsafe_allow_html=True)
     
-    ✅ حیسابکردنی تەکنیکی (وات، ئەمپێر، کیلۆوات)
+    with stats_col2:
+        st.markdown("""
+        <div class="metric-card" style="text-align: center; border-left: 4px solid #fa709a;">
+            <h1 style="color: #fa709a; margin: 0;">6</h1>
+            <p style="color: #888; margin: 0.5rem 0 0 0;">جۆری بەکارهێنەر</p>
+        </div>
+        """, unsafe_allow_html=True)
     
-    ✅ حیسابکردنی بەکارهێنانی مانگانە
+    with stats_col3:
+        st.markdown("""
+        <div class="metric-card" style="text-align: center; border-left: 4px solid #43e97b;">
+            <h1 style="color: #43e97b; margin: 0;">4</h1>
+            <p style="color: #888; margin: 0.5rem 0 0 0;">جۆری حیساب</p>
+        </div>
+        """, unsafe_allow_html=True)
     
-    ✅ زانیاری دەربارەی ئامێرە کارەباییەکان
+    st.markdown("<br>", unsafe_allow_html=True)
     
-    ✅ حیسابکردنی کۆی وات و ئەمپێر
-    """)
+    # Technology Stack
+    st.markdown("### 🔧 تەکنەلۆجیا بەکارهاتووەکان")
+    
+    tech_col1, tech_col2, tech_col3 = st.columns(3)
+    
+    with tech_col1:
+        st.markdown("""
+        <div style="text-align: center; padding: 1rem; background: white; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
+            <h1 style="font-size: 3rem; margin: 0;">🐍</h1>
+            <h4 style="margin: 0.5rem 0 0 0; color: #333;">Python</h4>
+            <p style="color: #888; font-size: 0.9rem; margin: 0.3rem 0 0 0;">زمانی پڕۆگرامسازی</p>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    with tech_col2:
+        st.markdown("""
+        <div style="text-align: center; padding: 1rem; background: white; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
+            <h1 style="font-size: 3rem; margin: 0;">🚀</h1>
+            <h4 style="margin: 0.5rem 0 0 0; color: #333;">Streamlit</h4>
+            <p style="color: #888; font-size: 0.9rem; margin: 0.3rem 0 0 0;">فریموۆرکی وێب</p>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    with tech_col3:
+        st.markdown("""
+        <div style="text-align: center; padding: 1rem; background: white; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
+            <h1 style="font-size: 3rem; margin: 0;">🎨</h1>
+            <h4 style="margin: 0.5rem 0 0 0; color: #333;">CSS3</h4>
+            <p style="color: #888; font-size: 0.9rem; margin: 0.3rem 0 0 0;">دیزاینی مۆدێرن</p>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    st.markdown("<br><br>", unsafe_allow_html=True)
+    
+    # Developer Section
+    st.markdown("""
+    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+                padding: 2rem; border-radius: 20px; text-align: center; color: white;">
+        <h2 style="margin: 0; color: white;">👨‍💻 گەشەپێدەر</h2>
+        <h1 style="margin: 0.5rem 0; color: white; font-size: 2.5rem;">AMANJ</h1>
+        <p style="margin: 0.5rem 0; color: rgba(255,255,255,0.9); font-size: 1.1rem;">
+            گەشەپێدەری ئەپڵیکەیشن و نەرمەواڵە
+        </p>
+        <div style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.2);">
+            <p style="margin: 0; color: rgba(255,255,255,0.8);">
+                وەشانی 1.0.7 - ٢٠٢٤
+            </p>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    st.markdown("<br>", unsafe_allow_html=True)
+    
+    # Tips Section
+    with st.expander("💡 ڕاوێژ و ئامۆژگاری", expanded=False):
+        st.markdown("""
+        ### چۆن باشترین بەکارهێنان بکەیت لەم ئەپڵیکەیشنە؟
+        
+        **بۆ حیسابی نرخ:**
+        - نرخی ماڵان بە سیستەمی پلەبەندییە (٥ پلە)
+        - زۆرترین بەکارهێنان = نرخی زۆرتر
+        - سەیر بە وردەکاری پلەکان بکە بۆ فێربوونی زیاتر
+        
+        **بۆ حیسابی تەکنیکی:**
+        - بۆ زانینی بەکارهێنانی مانگانە: وات × سەعات × ڕۆژ
+        - بۆ زانینی ئەمپێر: وات ÷ ٢٢٠
+        - بۆ زانینی کیلۆوات: وات ÷ ١٠٠٠
+        
+        **بۆ حیسابی ئامێرەکان:**
+        - هەموو ئامێرەکانی ماڵەکەت زیاد بکە
+        - کۆی گشتی بە شێوەی ئۆتۆماتیک حیساب دەکرێت
+        - دەتوانیت بڕی وات دەستکاری بکەیت بۆ هەر ئامێرێک
+        """)
+    
+    # Contact Section
+    st.markdown("<br>", unsafe_allow_html=True)
+    st.markdown("""
+    <div style="text-align: center; padding: 1.5rem; background: #f8f9fa; border-radius: 15px;">
+        <p style="color: #666; margin: 0;">
+            بۆ هەر پرسیار، پێشنیار، یان کێشەیەک
+        </p>
+        <p style="color: #667eea; font-weight: bold; margin: 0.5rem 0 0 0; font-size: 1.1rem;">
+            پەیوەندیمان پێوە بکە ✉️
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
 
 # Footer
 st.markdown("---")
