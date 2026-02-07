@@ -11,32 +11,39 @@ st.markdown("""
     .stApp { text-align: center; direction: rtl; }
     h1, h2, h3 { color: #2c3e50; }
     
-    /* ستایلی Sidebar یان Header */
-    .stRadio > div {
-        flex-direction: row !important;
-        justify-content: center !important;
-        gap: 20px;
-        background-color: #f8f9fa;
-        padding: 10px;
+    /* ستایلی هێدەر و ڕادیۆ بۆ دیزاینی ACBFA4 */
+    div.stRadio > div {
+        background-color: #f0f2f6;
+        padding: 15px;
         border-radius: 15px;
-        margin-bottom: 25px;
+        border-bottom: 4px solid #ACBFA4;
+        margin-bottom: 30px;
+        justify-content: center !important;
+    }
+    
+    /* ستایلی نووسینی ناو هێدەرەکە */
+    div.stRadio label {
+        font-weight: bold !important;
+        font-size: 18px !important;
+        color: #2c3e50 !important;
     }
 
-    /* ستایلی باکگراوندی لیستەکان */
+    /* ستایلی باکگراوندی لیستەکان کاتێک دەکرێنەوە */
     div[data-baseweb="popover"], div[data-baseweb="listbox"] {
         background-color: #EAEFEF !important;
     }
 
-    /* ستایلی دوگمەکان (ڕەنگی ACBFA4) */
+    /* ستایلی دوگمەکان بە ڕەنگی ACBFA4 */
     .stButton > button {
         display: block; margin: 10px auto !important; width: 100% !important;
         max-width: 300px; height: 55px; color: white !important; font-size: 18px !important;
         border: none; border-radius: 12px; font-weight: bold;
         background-color: #ACBFA4 !important; 
         transition: all 0.3s ease;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     }
     .stButton > button:hover {
-        background-color: #667eea !important; 
+        background-color: #94a88d !important; /* تۆختر بۆ کاتی ئاماژە */
         transform: translateY(-2px);
     }
     .stButton > button:active {
@@ -48,9 +55,9 @@ st.markdown("""
         background: white;
         padding: 25px;
         border-radius: 15px;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
         margin-bottom: 20px;
-        border-top: 5px solid #ACBFA4;
+        border-top: 6px solid #ACBFA4;
     }
     
     hr { border-top: 1px solid #ddd; margin: 20px 0; }
@@ -66,15 +73,16 @@ class ElectricityPro:
         self.volt = 220
 
     def main(self):
-        # دروستکردنی هێدەر بۆ گۆڕینی لاپەڕەکان
+        # دیزاینی هێدەر بە ڕەنگی ACBFA4 لە ژێری
+        st.markdown("<h2 style='text-align: center;'>⚡ سیستەمی مۆدێرنی کارەبا</h2>", unsafe_allow_html=True)
+        
         selected_page = st.radio(
-            "بەشەکان هەڵبژێرە:",
+            "بەشی مەبەست هەڵبژێرە:",
             ["هەژمارکردنی نرخ", "حیسابی تەکنیکی", "دەربارە"],
-            horizontal=True
+            horizontal=True,
+            label_visibility="collapsed"
         )
         
-        st.markdown("<hr>", unsafe_allow_html=True)
-
         if selected_page == "هەژمارکردنی نرخ":
             self.page_price_calc()
         elif selected_page == "حیسابی تەکنیکی":
@@ -82,75 +90,66 @@ class ElectricityPro:
         else:
             self.page_about()
 
-    # ---------------- لاپەڕەی یەکەم: هەژمارکردنی نرخ ----------------
     def page_price_calc(self):
         st.header("💰 هەژمارکردنی نرخی کارەبا")
+        st.markdown('<div class="custom-card">', unsafe_allow_html=True)
+        category = st.selectbox("جۆری هاوبەش هەڵبژێرە:", ["ماڵان", "بازرگانی", "پیشەسازی", "میری", "کشتوکاڵ"])
+        mode = st.radio("جۆری گۆڕین:", ["کیلۆوات بۆ دینار", "دینار بۆ کیلۆوات"], horizontal=True)
         
-        with st.container():
-            st.markdown('<div class="custom-card">', unsafe_allow_html=True)
-            category = st.selectbox("جۆری هاوبەش:", ["ماڵان", "بازرگانی", "پیشەسازی", "میری", "کشتوکاڵ"])
-            mode = st.radio("جۆری گۆڕین:", ["کیلۆوات ⬅️ دینار", "دینار ⬅️ کیلۆوات"], horizontal=True)
-            
-            if mode == "کیلۆوات ⬅️ دینار":
-                val = st.number_input("بڕی کیلۆوات (kWh):", min_value=0, step=1)
-                if st.button("هەژمار بکە"):
-                    res = self.calc_home_cost(val) if category == "ماڵان" else val * self.flat_rates.get(category, 0)
-                    st.success(f"کۆی گشتی: {res:,.0f} دینار")
-            else:
-                money = st.number_input("بڕی پارە (دینار):", min_value=0, step=1000)
-                if st.button("هەژمار بکە"):
-                    units = self.calc_money_to_units(money) if category == "ماڵان" else money / self.flat_rates.get(category, 1)
-                    st.info(f"بڕی کارەبا: {units:,.2f} کیلۆوات")
-            st.markdown('</div>', unsafe_allow_html=True)
+        if mode == "کیلۆوات بۆ دینار":
+            val = st.number_input("بڕی کیلۆوات (kWh):", min_value=0, step=1)
+            if st.button("هەژمارکردن"):
+                res = self.calc_home_cost(val) if category == "ماڵان" else val * self.flat_rates.get(category, 0)
+                st.success(f"تێچووی کۆتایی: {res:,.0f} دینار")
+        else:
+            money = st.number_input("بڕی پارە (دینار):", min_value=0, step=1000)
+            if st.button("هەژمارکردن"):
+                units = self.calc_money_to_units(money) if category == "ماڵان" else money / self.flat_rates.get(category, 1)
+                st.info(f"بڕی کارەبای وەرگیراو: {units:,.2f} کیلۆوات")
+        st.markdown('</div>', unsafe_allow_html=True)
 
-    # ---------------- لاپەڕەی دووەم: حیسابی تەکنیکی ----------------
     def page_technical_calc(self):
         st.header("⚙️ حیسابی تەکنیکی")
-        
-        calc_type = st.selectbox("چی هەژمار دەکەیت؟", ["وات بۆ ئەمپێر", "ئەمپێر بۆ کیلۆوات", "بەکارهێنانی مانگانە"])
-        
         st.markdown('<div class="custom-card">', unsafe_allow_html=True)
+        calc_type = st.selectbox("جۆری حیسابکردنەکە:", ["وات بۆ ئەمپێر", "ئەمپێر بۆ کیلۆوات", "بەکارهێنانی مانگانە ئامێرەکان"])
+        
         if calc_type == "وات بۆ ئەمپێر":
-            w = st.number_input("وات (Watt):", min_value=0)
-            if st.button("حیسابکردن"):
-                st.write(f"ئەنجام: {w/self.volt:.2f} ئەمپێر")
+            w = st.number_input("بڕی وات (Watt):", min_value=0)
+            if st.button("هەژمارکردن"):
+                st.info(f"ئەنجام: {w/self.volt:.2f} ئەمپێر")
                 
         elif calc_type == "ئەمپێر بۆ کیلۆوات":
             a = st.number_input("ئەمپێر (Ampere):", min_value=0.0)
-            h = st.number_input("کاتژمێر:", min_value=1)
-            if st.button("حیسابکردن"):
+            h = st.number_input("کاتژمێر کارکردن:", min_value=1)
+            if st.button("هەژمارکردن"):
                 kwh = (a * self.volt * h) / 1000
-                st.write(f"ئەنجام: {kwh:.2f} کیلۆوات")
+                st.info(f"ئەنجام: {kwh:.2f} کیلۆوات")
                 
-        else: # بەکارهێنانی مانگانە
-            w = st.number_input("واتی ئامێرەکە:", min_value=0)
+        else:
+            w = st.number_input("واتی ئامێر (نموونە بۆ سپلیت ٣٠٠٠ وات):", min_value=0)
             h = st.number_input("سەعات لە ڕۆژێکدا:", min_value=0.0)
             d = st.number_input("چەند ڕۆژ لە مانگدا:", value=30)
-            if st.button("حیسابکردنی مانگانە"):
+            if st.button("حیسابی مانگانە"):
                 total_kwh = (w * h * d) / 1000
-                st.info(f"بەکارهێنانی مانگانە: {total_kwh:.2f} کیلۆوات")
+                st.success(f"بەکارهێنانی مانگانە: {total_kwh:.2f} کیلۆوات")
         st.markdown('</div>', unsafe_allow_html=True)
 
-    # ---------------- لاپەڕەی سێیەم: دەربارە ----------------
     def page_about(self):
-        st.header("ℹ️ دەربارەی سیستەم و نرخەکان")
-        st.markdown("""
+        st.header("ℹ️ دەربارە و نرخەکان")
+        st.markdown(f"""
         <div class="custom-card" style="text-align: right;">
-            <h4>سیستەمی هەژمارکردنی کارەبای هەرێم</h4>
-            <p>ئەم بەرنامەیە بۆ ئاسانکاری هاوڵاتیان دروستکراوە بۆ زانینی تێچووی کارەبا.</p>
+            <h4>زانیاری گشتی</h4>
+            <p>ئەم پڕۆگرامە بە ڕەنگی تایبەتی <b>#ACBFA4</b> دیزاین کراوە بۆ کاک ئامانج.</p>
             <hr>
-            <h5>لیستی نرخەکان (ماڵان):</h5>
-            <ul>
-                <li>1 - 400 کیلۆوات: 72 دینار</li>
-                <li>401 - 800 کیلۆوات: 108 دینار</li>
-                <li>801 - 1200 کیلۆوات: 172 دینار</li>
-                <li>1201 - 1600 کیلۆوات: 265 دینار</li>
-                <li>سەرووی 1600 کیلۆوات: 350 دینار</li>
-            </ul>
+            <h5>نرخی ماڵان بەپێی پلەکان:</h5>
+            <p>١-٤٠٠ یەکە: ٧٢ دینار</p>
+            <p>٤٠١-٨٠٠ یەکە: ١٠٨ دینار</p>
+            <p>٨٠١-١٢٠٠ یەکە: ١٧٢ دینار</p>
+            <p>١٢٠١-١٦٠٠ یەکە: ٢٦٥ دینار</p>
+            <p>زیاتر لە ١٦٠٠: ٣٥٠ دینار</p>
         </div>
         """, unsafe_allow_html=True)
 
-    # مێتۆدە یارمەتیدەرەکان
     def calc_home_cost(self, kwh):
         total = 0
         temp = kwh
