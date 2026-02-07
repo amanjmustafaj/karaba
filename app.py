@@ -14,6 +14,14 @@ st.markdown("""
         color: #2c3e50;
         margin-bottom: 30px;
     }
+    
+    /* ستایلی تایتڵە ناوەندییەکان */
+    .centered-title {
+        text-align: center;
+        color: #2c3e50;
+        margin-top: 20px;
+        margin-bottom: 20px;
+    }
 
     .stButton > button {
         display: block; margin: 5px auto !important; width: 100% !important;
@@ -31,7 +39,6 @@ st.markdown("""
 
     hr { border-top: 1px solid #ACBFA4; opacity: 0.3; margin: 20px 0; }
     
-    /* ڕێکخستنی ستایلی خشتەکان بۆ ئەوەی لە ناوەڕاست بن */
     table {
         margin-left: auto;
         margin-right: auto;
@@ -91,11 +98,10 @@ class ElectricityPro:
             self.page_about()
 
     def page_info(self):
+        # ئەمە وەک خۆی هێڵدراوەتەوە بەبێ ناوەندکردنی تایتڵەکە بە HTML
         st.header("زانیاری نرخەکانی کارەبا")
         
-        # دروستکردنی دوو ستوون بۆ ئەوەی خشتەکان ببنە هاوتەریب
         left_col, right_col = st.columns(2)
-        
         with left_col:
             st.subheader("نرخی جۆرە جیاوازەکان")
             info_md = "| جۆری کارەبا | نرخ (دینار) |\n"
@@ -113,7 +119,9 @@ class ElectricityPro:
             st.markdown(home_md)
 
     def page_price_calc(self):
-        st.header("هەژمارکردنی نرخ")
+        # بەکارهێنانی HTML بۆ هێنانە ناوەڕاست
+        st.markdown("<h2 class='centered-title'>هەژمارکردنی نرخ</h2>", unsafe_allow_html=True)
+        
         category = st.selectbox("جۆری هاوبەش هەڵبژێرە:", ["ماڵان", "بازرگانی", "پیشەسازی", "میری", "کشتوکاڵ"])
         
         c1, c2 = st.columns(2)
@@ -154,12 +162,14 @@ class ElectricityPro:
             table_md += f"| {name} | {consumed:,.0f} | {price} | {cost:,.0f} |\n"
             temp_kwh -= consumed
         
-        st.write("### وردەکاری هەژمارکردن")
+        st.markdown("<h3 class='centered-title'>وردەکاری هەژمارکردن</h3>", unsafe_allow_html=True)
         st.markdown(table_md)
         st.success(f"### کۆی گشتی: {total_price:,.0f} دینار")
 
     def page_technical_calc(self):
-        st.header("حیسابی تەکنیکی")
+        # بەکارهێنانی HTML بۆ هێنانە ناوەڕاست
+        st.markdown("<h2 class='centered-title'>حیسابی تەکنیکی</h2>", unsafe_allow_html=True)
+        
         calc_type = st.selectbox("جۆری گۆڕین هەڵبژێرە:", ["وات بۆ ئەمپێر", "ئەمپێر بۆ کیلۆوات", "بەکارهێنانی مانگانە"])
         
         if calc_type == "وات بۆ ئەمپێر":
@@ -181,7 +191,8 @@ class ElectricityPro:
                 st.success(f"بەکارهێنانی مانگانە: {total_kwh:.2f} کیلۆوات")
 
     def page_about(self):
-        st.header("دەربارە")
+        # بەکارهێنانی HTML بۆ هێنانە ناوەڕاست
+        st.markdown("<h2 class='centered-title'>دەربارە</h2>", unsafe_allow_html=True)
         st.write("ئەم پڕۆگرامە بۆ هەژمارکردنی نرخ و حیسابە تەکنیکییەکان بەکار دێت.")
 
     def calc_money_to_units(self, money):
