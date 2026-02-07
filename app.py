@@ -40,6 +40,14 @@ st.markdown("""
         font-weight: bold;
         box-shadow: 0 5px 15px rgba(0,0,0,0.2);
     }
+    .monthly-result {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        color: white;
+        padding: 25px;
+        border-radius: 15px;
+        margin: 20px 0;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+    }
     </style>
     """, unsafe_allow_html=True)
 
@@ -143,7 +151,7 @@ class ElectricityCalculator:
         
         calc_type = st.selectbox(
             "جۆری حیساب هەڵبژێرە:",
-            ["وات بۆ ئەمپێر", "وات بۆ کیلۆوات", "ئەمپێر بۆ کیلۆوات"]
+            ["وات بۆ ئەمپێر", "وات بۆ کیلۆوات", "ئەمپێر بۆ کیلۆوات", "حیسابی بەکارهێنانی مانگانە"]
         )
         
         st.write("")
@@ -152,8 +160,123 @@ class ElectricityCalculator:
             self.watt_to_ampere()
         elif calc_type == "وات بۆ کیلۆوات":
             self.watt_to_kwh()
-        else:
+        elif calc_type == "ئەمپێر بۆ کیلۆوات":
             self.ampere_to_kwh()
+        else:
+            self.monthly_usage_calculator()
+
+    def monthly_usage_calculator(self):
+        """حیسابی بەکارهێنانی مانگانەی ئامێرەکان"""
+        st.markdown('<div class="calculator-card">', unsafe_allow_html=True)
+        st.write("### حیسابی بەکارهێنانی مانگانە")
+        st.write("*بۆ نموونە: لامپایەک 100 وات، 2 کاتژمێر لە ڕۆژدا، بۆ 30 ڕۆژ*")
+        st.write("")
+        
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            watt = st.number_input("وات:", min_value=0, step=10, key="monthly_watt", help="توانای ئامێرەکە بە وات")
+        with col2:
+            hours_per_day = st.number_input("کاتژمێر/ڕۆژ:", min_value=0.0, step=0.5, key="hours_day", help="چەند کاتژمێر لە ڕۆژێکدا بەکاردێت")
+        with col3:
+            days = st.number_input("ژمارەی ڕۆژەکان:", min_value=1, max_value=31, value=30, step=1, key="days_month", help="ژمارەی ڕۆژەکان (مانگێک = 30 ڕۆژ)")
+        
+        st.markdown('</div>', unsafe_allow_html=True)
+        
+        if st.button("حیسابکردن", type="primary", use_container_width=True, key="calc_monthly"):
+            if watt > 0 and hours_per_day > 0 and days > 0:
+                # حیسابکردنی بەکارهێنانی ڕۆژانە
+                daily_kwh = (watt * hours_per_day) / 1000
+                
+                # حیسابکردنی بەکارهێنانی مانگانە
+                monthly_kwh = daily_kwh * days
+                
+                # نیشاندانی ئەنجامەکان
+                st.markdown('<div class="monthly-result">', unsafe_allow_html=True)
+                st.write(f"### 📊 ئەنجامی حیسابکردن")
+                st.write("")
+                st.write(f"**بەکارهێنانی ڕۆژانە:** {daily_kwh:.3f} کیلۆوات")
+                st.write(f"**بەکارهێنانی کۆی گشتی ({days} ڕۆژ):** {monthly_kwh:.2f} کیلۆوات")
+                st.markdown('</div>', unsafe_allow_html=True)
+                
+                # حیسابکردنی نرخەکان بۆ جۆرە جیاوازەکان
+                st.write("---")
+                st.write("### 💰 نرخی کارەبا بە پێی جۆری هاوبەش")
+                st.write("")
+                
+                # نرخ بۆ ماڵان (بە پلەکان)
+                home_cost = self.calculate_home_cost(monthly_kwh)
+                
+                col1, col2 = st.columns(2)
+                with col1:
+                    st.info(f"**ماڵان (بە پلەکان):**\n\n{home_cost:,.0f} دینار")
+                
+                with col2:
+                    commercial_cost = monthly_kwh * self.flat_rates["بازرگانی"]
+                    st.info(f"**بازرگانی:**\n\n{commercial_cost:,.0f} دینار")
+                
+                col3, col4 = st.columns(2)
+                with col3:
+                    industrial_cost = monthly_kwh * self.flat_rates["پیشەسازی"]
+                    st.info(f"**پیشەسازی:**\n\n{industrial_cost:,.0f} دینار")
+                
+                with col4:
+                    agriculture_cost = monthly_kwh * self.flat_rates["کشتوکاڵ"]
+                    st.info(f"**کشتوکاڵ:**\n\n{agriculture_cost:,.0f} دینار")
+                
+                # وردەکاری حیساب
+                st.write("---")
+                st.write("### 📝 وردەکاری حیساب")
+                st.info(f"""
+                **فۆرمولەکان:**
+                
+                1. بەکارهێنانی ڕۆژانە = (وات × کاتژمێر/ڕۆژ) ÷ 1000
+                   - ({watt} × {hours_per_day}) ÷ 1000 = {daily_kwh:.3f} کیلۆوات
+                
+                2. بەکارهێنانی کۆی گشتی = بەکارهێنانی ڕۆژانە × ژمارەی ڕۆژەکان
+                   - {daily_kwh:.3f} × {days} = {monthly_kwh:.2f} کیلۆوات
+                """)
+                
+                # نموونەی ئامێرە باوەکان
+                st.write("---")
+                st.write("### 💡 نموونەی ئامێرە کارەباییە باوەکان")
+                
+                col1, col2, col3 = st.columns(3)
+                with col1:
+                    st.write("**لامپای LED:**")
+                    st.write("10-20 وات")
+                    st.write("")
+                    st.write("**فڕی:**")
+                    st.write("60-100 وات")
+                
+                with col2:
+                    st.write("**تەلەڤیزیۆن:**")
+                    st.write("50-200 وات")
+                    st.write("")
+                    st.write("**ساردکەرەوە:**")
+                    st.write("150-400 وات")
+                
+                with col3:
+                    st.write("**وا کولێر:**")
+                    st.write("1500-2500 وات")
+                    st.write("")
+                    st.write("**مەشینی شۆردن:**")
+                    st.write("500-2000 وات")
+
+    def calculate_home_cost(self, kwh):
+        """حیسابکردنی نرخ بۆ ماڵان بە پلەکان"""
+        total_cost = 0
+        temp_usage = kwh
+        
+        for limit, price in self.home_tiers:
+            if temp_usage > 0:
+                consumed = min(temp_usage, limit)
+                cost = consumed * price
+                total_cost += cost
+                temp_usage -= consumed
+            else:
+                break
+        
+        return total_cost
 
     def watt_to_ampere(self):
         """گۆڕینی وات بۆ ئەمپێر"""
