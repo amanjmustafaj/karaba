@@ -13,7 +13,7 @@ st.markdown("""
         text-align: center !important; width: 100%; font-size: 18px; font-weight: bold;
     }
     
-    /* ستایلی دوگمەکە بەو شێوەیەی داوات کردووە */
+    /* ستایلی دوگمەکە */
     .stButton > button {
         display: block; margin: 10px auto !important; width: 280px !important;
         height: 60px; color: white !important; font-size: 20px !important;
@@ -22,13 +22,19 @@ st.markdown("""
         transition: background-color 0.2s ease;
     }
     
+    /* کاتی هووڤەر: مۆر */
     .stButton > button:hover {
-        background-color: #667eea !important; /* کاتی هووڤەر: مۆر */
+        background-color: #667eea !important; 
         color: white !important;
     }
     
-    .stButton > button:active {
-        background-color: red !important; /* کاتی داگرتن: سوور */
+    /* کاتی داگرتن و دوای داگرتن: سوور دەمێنێتەوە */
+    .stButton > button:active, .stButton > button:focus {
+        background-color: red !important;
+        color: white !important;
+        border: none !important;
+        outline: none !important;
+        box-shadow: none !important;
     }
 
     .calculator-card {
