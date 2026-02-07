@@ -194,8 +194,11 @@ class ElectricityCalculator:
                 st.markdown('<div class="monthly-result">', unsafe_allow_html=True)
                 st.write(f"### 📊 ئەنجامی حیسابکردن")
                 st.write("")
-                st.write(f"**بەکارهێنانی ڕۆژانە:** {daily_kwh:.3f} کیلۆوات")
-                st.write(f"**بەکارهێنانی کۆی گشتی ({days} ڕۆژ):** {monthly_kwh:.2f} کیلۆوات")
+                # نیشاندانی ژمارە بێ فارزە ئەگەر تەواو بێت
+                daily_display = int(daily_kwh) if daily_kwh == int(daily_kwh) else f"{daily_kwh:.2f}"
+                monthly_display = int(monthly_kwh) if monthly_kwh == int(monthly_kwh) else f"{monthly_kwh:.2f}"
+                st.write(f"**بەکارهێنانی ڕۆژانە:** {daily_display} کیلۆوات")
+                st.write(f"**بەکارهێنانی کۆی گشتی ({days} ڕۆژ):** {monthly_display} کیلۆوات")
                 st.markdown('</div>', unsafe_allow_html=True)
                 
                 # حیسابکردنی نرخەکان بۆ جۆرە جیاوازەکان
@@ -223,44 +226,9 @@ class ElectricityCalculator:
                     agriculture_cost = monthly_kwh * self.flat_rates["کشتوکاڵ"]
                     st.info(f"**کشتوکاڵ:**\n\n{agriculture_cost:,.0f} دینار")
                 
+                
                 # وردەکاری حیساب
-                st.write("---")
-                st.write("### 📝 وردەکاری حیساب")
-                st.info(f"""
-                **فۆرمولەکان:**
-                
-                1. بەکارهێنانی ڕۆژانە = (وات × کاتژمێر/ڕۆژ) ÷ 1000
-                   - ({watt} × {hours_per_day}) ÷ 1000 = {daily_kwh:.3f} کیلۆوات
-                
-                2. بەکارهێنانی کۆی گشتی = بەکارهێنانی ڕۆژانە × ژمارەی ڕۆژەکان
-                   - {daily_kwh:.3f} × {days} = {monthly_kwh:.2f} کیلۆوات
-                """)
-                
-                # نموونەی ئامێرە باوەکان
-                st.write("---")
-                st.write("### 💡 نموونەی ئامێرە کارەباییە باوەکان")
-                
-                col1, col2, col3 = st.columns(3)
-                with col1:
-                    st.write("**لامپای LED:**")
-                    st.write("10-20 وات")
-                    st.write("")
-                    st.write("**فڕی:**")
-                    st.write("60-100 وات")
-                
-                with col2:
-                    st.write("**تەلەڤیزیۆن:**")
-                    st.write("50-200 وات")
-                    st.write("")
-                    st.write("**ساردکەرەوە:**")
-                    st.write("150-400 وات")
-                
-                with col3:
-                    st.write("**وا کولێر:**")
-                    st.write("1500-2500 وات")
-                    st.write("")
-                    st.write("**مەشینی شۆردن:**")
-                    st.write("500-2000 وات")
+
 
     def calculate_home_cost(self, kwh):
         """حیسابکردنی نرخ بۆ ماڵان بە پلەکان"""
