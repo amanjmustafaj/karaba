@@ -40,7 +40,7 @@ class ElectricityCalculator:
             (400, 72),
             (400, 108),
             (400, 172),
-            (400, 265),    # گۆڕدرا لە 260 بۆ 265
+            (400, 265),
             (999999, 350)
         ]
 
@@ -128,17 +128,17 @@ class ElectricityCalculator:
             st.write("")
             col1, col2, col3, col4, col5 = st.columns(5)
             with col1:
-                st.write("**یەکەم 400**")
+                st.write("**تا 400**")
                 st.write("72 دینار")
             with col2:
-                st.write("**دووەم 400**")
+                st.write("**تا 800**")
                 st.write("108 دینار")
             with col3:
-                st.write("**سێیەم 400**")
+                st.write("**تا 1200**")
                 st.write("172 دینار")
             with col4:
-                st.write("**چوارەم 400**")
-                st.write("265 دینار")  # گۆڕدرا
+                st.write("**تا 1600**")
+                st.write("265 دینار")
             with col5:
                 st.write("**زیاتر**")
                 st.write("350 دینار")
@@ -184,17 +184,17 @@ class ElectricityCalculator:
             st.write("")
             col1, col2, col3, col4, col5 = st.columns(5)
             with col1:
-                st.write("**یەکەم 400**")
+                st.write("**تا 400**")
                 st.write("72 دینار")
             with col2:
-                st.write("**دووەم 400**")
+                st.write("**تا 800**")
                 st.write("108 دینار")
             with col3:
-                st.write("**سێیەم 400**")
+                st.write("**تا 1200**")
                 st.write("172 دینار")
             with col4:
-                st.write("**چوارەم 400**")
-                st.write("265 دینار")  # گۆڕدرا
+                st.write("**تا 1600**")
+                st.write("265 دینار")
             with col5:
                 st.write("**زیاتر**")
                 st.write("350 دینار")
