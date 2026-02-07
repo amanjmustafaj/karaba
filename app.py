@@ -31,18 +31,16 @@ st.markdown("""
 
     hr { border-top: 1px solid #ACBFA4; opacity: 0.3; margin: 20px 0; }
     
-    /* ستایلی خشتەی زانیارییەکان */
-    .info-table {
-        width: 100%;
-        border-collapse: collapse;
-        margin: 20px 0;
+    /* ڕێکخستنی ستایلی خشتەکان بۆ ئەوەی لە ناوەڕاست بن */
+    table {
+        margin-left: auto;
+        margin-right: auto;
     }
     </style>
     """, unsafe_allow_html=True)
 
 class ElectricityPro:
     def __init__(self):
-        # نرخە جێگیرەکان (بۆ هەر ١ کیلۆوات)
         self.flat_rates = {
             "بازرگانی": 185, 
             "پیشەسازی گەورە": 125, 
@@ -50,13 +48,12 @@ class ElectricityPro:
             "میری": 160, 
             "کشتوکاڵ": 60
         }
-        # پلەکانی ماڵان
         self.home_tiers = [
-            ("پلەی یەکەم (1-400)", 400, 72),
-            ("پلەی دووەم (401-800)", 400, 108),
-            ("پلەی سێیەم (801-1200)", 400, 172),
-            ("پلەی چوارەم (1201-1600)", 400, 265),
-            ("پلەی پێنجەم (سەروو 1600)", 999999, 350)
+            ("پلەی ١ (1-400)", 400, 72),
+            ("پلەی ٢ (401-800)", 400, 108),
+            ("پلەی ٣ (801-1200)", 400, 172),
+            ("پلەی ٤ (1201-1600)", 400, 265),
+            ("پلەی ٥ (سەروو ١٦٠٠)", 999999, 350)
         ]
         self.volt = 220
 
@@ -68,7 +65,6 @@ class ElectricityPro:
     def main(self):
         st.markdown("<h1 class='main-title'>هەژمارکردنی نرخی کارەبا</h1>", unsafe_allow_html=True)
         
-        # زیادکردنی دوگمەی "زانیاری" بۆ هێدەرەکە
         col1, col2, col3, col4 = st.columns(4)
         with col1:
             if st.button("هەژمارکردنی نرخ"):
@@ -96,25 +92,25 @@ class ElectricityPro:
 
     def page_info(self):
         st.header("زانیاری نرخەکانی کارەبا")
-        st.write("لێرەدا تێچووی هەر ١ کیلۆوات (kWh) بۆ هەموو جۆرەکان ڕوون کراوەتەوە:")
         
-        # خشتەی نرخە جێگیرەکان
-        info_md = "| جۆری کارەبا | نرخی ١ کیلۆوات (دینار) |\n"
-        info_md += "| :--- | :---: |\n"
-        for cat, price in self.flat_rates.items():
-            info_md += f"| {cat} | {price} |\n"
-        st.markdown(info_md)
+        # دروستکردنی دوو ستوون بۆ ئەوەی خشتەکان ببنە هاوتەریب
+        left_col, right_col = st.columns(2)
         
-        st.write("---")
+        with left_col:
+            st.subheader("نرخی جۆرە جیاوازەکان")
+            info_md = "| جۆری کارەبا | نرخ (دینار) |\n"
+            info_md += "| :--- | :---: |\n"
+            for cat, price in self.flat_rates.items():
+                info_md += f"| {cat} | {price} |\n"
+            st.markdown(info_md)
         
-        # خشتەی پلەکانی ماڵان
-        st.subheader("خشتەی پلەکانی کارەبای ماڵان")
-        home_md = "| پلەی بەکارهێنان | بڕی یەکە (kWh) | نرخی یەکە (دینار) |\n"
-        home_md += "| :--- | :---: | :---: |\n"
-        for name, limit, price in self.home_tiers:
-            limit_str = "بێ سنوور" if limit > 100000 else limit
-            home_md += f"| {name} | {limit_str} | {price} |\n"
-        st.markdown(home_md)
+        with right_col:
+            st.subheader("خشتەی پلەکانی ماڵان")
+            home_md = "| پلەی بەکارهێنان | نرخ (دینار) |\n"
+            home_md += "| :--- | :---: |\n"
+            for name, limit, price in self.home_tiers:
+                home_md += f"| {name} | {price} |\n"
+            st.markdown(home_md)
 
     def page_price_calc(self):
         st.header("هەژمارکردنی نرخ")
@@ -147,7 +143,7 @@ class ElectricityPro:
     def show_home_details_no_pandas(self, kwh):
         temp_kwh = kwh
         total_price = 0
-        table_md = "| پلەی هەژمارکردن | بڕی یەکە (kWh) | نرخی یەکە | کۆی تێچوو |\n"
+        table_md = "| پلە | یەکە | نرخ | تێچوو |\n"
         table_md += "| :--- | :---: | :---: | :---: |\n"
         
         for name, limit, price in self.home_tiers:
@@ -155,10 +151,10 @@ class ElectricityPro:
             consumed = min(temp_kwh, limit)
             cost = consumed * price
             total_price += cost
-            table_md += f"| {name} | {consumed:,.0f} | {price} دینار | {cost:,.0f} دینار |\n"
+            table_md += f"| {name} | {consumed:,.0f} | {price} | {cost:,.0f} |\n"
             temp_kwh -= consumed
         
-        st.write("### وردەکاری هەژمارکردن بۆ ماڵان")
+        st.write("### وردەکاری هەژمارکردن")
         st.markdown(table_md)
         st.success(f"### کۆی گشتی: {total_price:,.0f} دینار")
 
