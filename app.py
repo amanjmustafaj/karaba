@@ -22,6 +22,11 @@ st.markdown("""
         transform: scale(1.05);
         box-shadow: 0 5px 15px rgba(0,0,0,0.3);
     }
+    hr {
+        border: none;
+        border-top: 3px solid #007bff;
+        margin: 30px 0;
+    }
     </style>
     """, unsafe_allow_html=True)
 
@@ -126,11 +131,29 @@ class ElectricityCalculator:
                     
                     temp_usage -= consumed
             
-            st.write("---")
+            st.markdown("---")
             st.success(f"### کۆی گشتی: {total_cost:,} دینار")
+            
+            # زانیاری نرخەکانی ماڵان
+            st.markdown("---")
+            st.info("### نرخەکانی کارەبا بۆ ماڵان:")
+            st.write("**پلەی یەکەم:** یەکەم 400 kWh = 72 دینار بۆ هەر kWh")
+            st.write("**پلەی دووەم:** دووەم 400 kWh = 108 دینار بۆ هەر kWh")
+            st.write("**پلەی سێیەم:** سێیەم 400 kWh = 172 دینار بۆ هەر kWh")
+            st.write("**پلەی چوارەم:** چوارەم 400 kWh = 260 دینار بۆ هەر kWh")
+            st.write("**پلەی پێنجەم:** زیاتر لە 1600 kWh = 350 دینار بۆ هەر kWh")
+            
         else:
             total_cost = kwh * self.flat_rates[category]
-            st.success(f"تێچووی گشتی: {total_cost:,} دینار")
+            st.success(f"### کۆی گشتی: {total_cost:,} دینار")
+            
+            # زانیاری نرخەکانی کاتیگۆرییەکانی دیکە
+            st.markdown("---")
+            st.info(f"### نرخی کارەبا بۆ {category}:")
+            st.write(f"**نرخی یەکە:** {self.flat_rates[category]} دینار بۆ هەر kWh")
+            st.write(f"**بۆ نموونە:** 100 kWh = {100 * self.flat_rates[category]:,} دینار")
+            st.write(f"**بۆ نموونە:** 500 kWh = {500 * self.flat_rates[category]:,} دینار")
+            st.write(f"**بۆ نموونە:** 1000 kWh = {1000 * self.flat_rates[category]:,} دینار")
 
     def calculate_units(self, category, money):
         """دینار دەگۆڕێت بۆ kWh"""
@@ -157,7 +180,28 @@ class ElectricityCalculator:
         else:
             total_units = money / self.flat_rates[category]
 
-        st.info(f"بڕی کارەبا: {round(total_units, 2):,} kWh")
+        st.info(f"### بڕی کارەبا: {round(total_units, 2):,} kWh")
+        
+        # زانیاری نرخەکان بۆ هەموو کاتیگۆرییەکان
+        st.markdown("---")
+        st.success("### نرخەکانی کارەبا بۆ هەموو جۆرەکان:")
+        
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            st.write("**ماڵان:**")
+            st.write("• یەکەم 400 kWh: 72 دینار")
+            st.write("• دووەم 400 kWh: 108 دینار")
+            st.write("• سێیەم 400 kWh: 172 دینار")
+            st.write("• چوارەم 400 kWh: 260 دینار")
+            st.write("• زیاتر لە 1600 kWh: 350 دینار")
+        
+        with col2:
+            st.write("**بازرگانی:** 185 دینار/kWh")
+            st.write("**پیشەسازی:** 160 دینار/kWh")
+            st.write("**میری:** 160 دینار/kWh")
+            st.write("**پیشەسازی گەورە:** 125 دینار/kWh")
+            st.write("**کشتوکاڵ:** 60 دینار/kWh")
 
 if __name__ == "__main__":
     app = ElectricityCalculator()
