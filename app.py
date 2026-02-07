@@ -45,7 +45,7 @@ class ElectricityCalculator:
         ]
 
     def run(self):
-        st.title("⚡ سیستەمی هەژمارکردنی کارەبا")
+        st.title("سیستەمی هەژمارکردنی کارەبا")
         st.write("---")
 
         # هەڵبژاردنی جۆری هاوبەش
@@ -64,12 +64,12 @@ class ElectricityCalculator:
         col1, col2 = st.columns(2)
         
         with col1:
-            kwh_button = st.button("🔢 kWh ➡️ دینار", use_container_width=True, type="primary")
+            kwh_button = st.button("kWh بۆ دینار", use_container_width=True, type="primary")
             if kwh_button:
                 st.session_state.mode = "kwh_to_dinar"
         
         with col2:
-            dinar_button = st.button("💰 دینار ➡️ kWh", use_container_width=True, type="secondary")
+            dinar_button = st.button("دینار بۆ kWh", use_container_width=True, type="secondary")
             if dinar_button:
                 st.session_state.mode = "dinar_to_kwh"
 
@@ -77,24 +77,24 @@ class ElectricityCalculator:
 
         # هەژمارکردن بەپێی ئاراستە
         if st.session_state.mode == "kwh_to_dinar":
-            st.subheader("🔢 گۆڕینی kWh بۆ دینار")
+            st.subheader("گۆڕینی kWh بۆ دینار")
             kwh = st.number_input("بڕی کارەبا داخڵ بکە (kWh):", min_value=0, step=1)
             
-            if st.button("⚡ هەژمارکردن", type="primary", use_container_width=True):
+            if st.button("هەژمارکردن", type="primary", use_container_width=True):
                 if kwh > 0:
                     self.calculate_price(category, kwh)
                 else:
-                    st.warning("⚠️ تکایە ژمارەیەک زیاتر لە سفر داخڵ بکە!")
+                    st.warning("تکایە ژمارەیەک زیاتر لە سفر داخڵ بکە")
         
         else:
-            st.subheader("💰 گۆڕینی دینار بۆ kWh")
+            st.subheader("گۆڕینی دینار بۆ kWh")
             money = st.number_input("بڕی پارە داخڵ بکە (دینار):", min_value=0, step=1000)
             
-            if st.button("⚡ هەژمارکردن", type="primary", use_container_width=True):
+            if st.button("هەژمارکردن", type="primary", use_container_width=True):
                 if money > 0:
                     self.calculate_units(category, money)
                 else:
-                    st.warning("⚠️ تکایە ژمارەیەک زیاتر لە سفر داخڵ بکە!")
+                    st.warning("تکایە ژمارەیەک زیاتر لە سفر داخڵ بکە")
 
     def calculate_price(self, category, kwh):
         """kWh دەگۆڕێت بۆ دینار"""
@@ -110,7 +110,7 @@ class ElectricityCalculator:
         else:
             total_cost = kwh * self.flat_rates[category]
         
-        st.success(f"💰 **تێچووی گشتی: {total_cost:,} دینار**")
+        st.success(f"تێچووی گشتی: {total_cost:,} دینار")
 
     def calculate_units(self, category, money):
         """دینار دەگۆڕێت بۆ kWh"""
@@ -137,7 +137,7 @@ class ElectricityCalculator:
         else:
             total_units = money / self.flat_rates[category]
 
-        st.info(f"⚡ **بڕی کارەبا: {round(total_units, 2):,} kWh**")
+        st.info(f"بڕی کارەبا: {round(total_units, 2):,} kWh")
 
 if __name__ == "__main__":
     app = ElectricityCalculator()
