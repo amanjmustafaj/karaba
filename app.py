@@ -16,10 +16,10 @@ st.markdown("""
         display: block; margin: 10px auto !important; width: 280px !important;
         height: 60px; color: white; font-size: 20px !important;
         border: none; border-radius: 12px; font-weight: bold;
-        transition: all 0.3s ease;
+        transition: background-color 0.3s ease, box-shadow 0.3s ease;
     }
     .stButton > button:hover {
-        transform: scale(1.05);
+        background-color: #5a67d8 !important;
         box-shadow: 0 5px 15px rgba(0,0,0,0.3);
     }
     .calculator-card {
