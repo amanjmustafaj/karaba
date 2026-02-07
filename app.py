@@ -1,48 +1,27 @@
 import streamlit as st
 
 # ==========================================
-# 1. Page Configuration & Styling (CSS)
+# 1. Page Configuration & Styling
 # ==========================================
 st.set_page_config(page_title="هەژمارکردنی کارەبا", page_icon="⚡")
 
 st.markdown("""
     <style>
-    .stApp {
-        text-align: center;
-        direction: rtl;
-    }
-    h1, h2, h3, p, div {
-        text-align: center !important;
-    }
-    .stSelectbox label, .stNumberInput label {
-        text-align: center !important;
-        width: 100%;
-        font-size: 18px;
-        font-weight: bold;
+    .stApp { text-align: center; direction: rtl; }
+    h1, h2, h3, p, div { text-align: center !important; }
+    .stSelectbox label, .stNumberInput label, .stRadio label {
+        text-align: center !important; width: 100%; font-size: 18px; font-weight: bold;
     }
     .stButton > button {
-        display: block;
-        margin: 20px auto !important;
-        width: 200px !important;
-        height: 50px;
-        background-color: #007bff;
-        color: white;
-        font-size: 18px !important;
-        border: none;
-        border-radius: 8px;
+        display: block; margin: 20px auto !important; width: 200px !important;
+        height: 50px; background-color: #007bff; color: white; font-size: 18px !important;
+        border: none; border-radius: 8px;
     }
     </style>
     """, unsafe_allow_html=True)
 
-# ==========================================
-# 2. Main Class Structure
-# ==========================================
 class ElectricityCalculator:
     def __init__(self):
-        # Residential pricing tiers (Residential/Home)
-        self.residential_prices = [72, 108, 172, 260, 350]
-        
-        # Flat rates for other categories
         self.flat_rates = {
             "بازرگانی": 185,
             "پیشەسازی گەورە": 125,
@@ -51,86 +30,71 @@ class ElectricityCalculator:
             "کشتوکاڵ": 60
         }
 
-    def show_interface(self):
-        st.title(" سیستەمی هەژمارکردنی نرخی کارەبا")
+    def run(self):
+        st.title("سیستەمی پێشکەوتووی هەژمارکردنی کارەبا")
         st.write("---")
 
-        user_category = st.selectbox(
+        # لێرە هەڵدەبژێریت چیت دەوێت
+        mode = st.radio(
+            "جۆری گۆڕین هەڵبژێرە:",
+            ["بڕی یەکە (kWh) ⬅️ نرخ (دینار)", "نرخ (دینار) ⬅️ بڕی یەکە (kWh)"]
+        )
+
+        category = st.selectbox(
             "جۆری هاوبەش هەڵبژێرە:",
             ["ماڵان", "بازرگانی", "پیشەسازی گەورە", "پیشەسازی", "میری", "کشتوکاڵ"]
         )
-        
-        usage_kwh = st.number_input("بڕی بەکارهێنان بە (kWh):", min_value=0, step=1)
-        
-        return user_category, usage_kwh
 
-    def run_calculation(self):
-        category, kwh = self.show_interface()
+        val = st.number_input("بڕەکە داخڵ بکە:", min_value=0, step=1)
 
         if st.button("هەژمارکردن"):
-            billing_details = []
-            total_cost = 0
-
-            if category == "ماڵان":
-                temp_usage = kwh
-                # Defining the tiers: (Label, Limit per tier, Price)
-                tiers = [
-                    ("٤٠٠ی یەکەم", 400, self.residential_prices[0]),
-                    ("٤٠٠ی دووەم", 400, self.residential_prices[1]),
-                    ("٤٠٠ی سێیەم", 400, self.residential_prices[2]),
-                    ("٤٠٠ی چوارەم", 400, self.residential_prices[3]),
-                    ("سەرووی ١٦٠٠", 9999999, self.residential_prices[4])
-                ]
-
-                for label, limit, price in tiers:
-                    if temp_usage > 0:
-                        consumed = min(temp_usage, limit)
-                        cost_per_tier = consumed * price
-                        billing_details.append({
-                            "description": label, 
-                            "units": consumed, 
-                            "rate": price, 
-                            "subtotal": cost_per_tier
-                        })
-                        total_cost += cost_per_tier
-                        temp_usage -= consumed
+            if mode == "بڕی یەکە (kWh) ⬅️ نرخ (دینار)":
+                self.calculate_price(category, val)
             else:
-                # Flat rate calculation for non-residential
-                unit_price = self.flat_rates[category]
-                total_cost = kwh * unit_price
-                billing_details.append({
-                    "description": category, 
-                    "units": kwh, 
-                    "rate": unit_price, 
-                    "subtotal": total_cost
-                })
+                self.calculate_units(category, val)
 
-            # Rendering the breakdown table
-            st.markdown("### 📊 وردەکاری هەژمارکردن")
-            
-            # Header Columns
-            col1, col2, col3, col4 = st.columns(4)
-            with col1: st.markdown("**قۆناغ / جۆر**")
-            with col2: st.markdown("**بڕ (kWh)**")
-            with col3: st.markdown("**نرخ**")
-            with col4: st.markdown("**تێچوو**")
-            st.markdown("---")
+    def calculate_price(self, category, kwh):
+        # هەمان لۆژیکی کۆدە کۆنەکەت بۆ دەرکردنی نرخ
+        total_cost = 0
+        if category == "ماڵان":
+            temp_usage = kwh
+            tiers = [(400, 72), (400, 108), (400, 172), (400, 260), (999999, 350)]
+            for limit, price in tiers:
+                if temp_usage > 0:
+                    consumed = min(temp_usage, limit)
+                    total_cost += consumed * price
+                    temp_usage -= consumed
+        else:
+            total_cost = kwh * self.flat_rates[category]
+        
+        st.success(f"💰 تێچووی گشتی: **{total_cost:,}** دینار")
 
-            # Row Data
-            for item in billing_details:
-                c1, c2, c3, c4 = st.columns(4)
-                with c1: st.write(item["description"])
-                with c2: st.write(f"{item['units']:,}")
-                with c3: st.write(f"{item['rate']}")
-                with c4: st.write(f"**{item['subtotal']:,}**")
+    def calculate_units(self, category, money):
+        # ئەو لۆژیکەی خۆت کە ناردت بۆ دەرکردنی بڕی یەکە (kWh)
+        total_units = 0
+        
+        if category == "پیشەسازی گەورە":
+            total_units = money / 125
+        elif category == "بازرگانی":
+            total_units = money / 185
+        elif category in ["میری", "پیشەسازی"]:
+            total_units = money / 160
+        elif category == "کشتوکاڵ":
+            total_units = money / 60
+        else: # ماڵان بەپێی ئەو مەرجانەی خۆت داتنابوو
+            if money < 28800:
+                total_units = money / 72
+            elif 28800 <= money <= 86400:
+                total_units = money / 108
+            elif 86400 < money <= 210000:
+                total_units = money / 175
+            elif 210000 < money <= 400000:
+                total_units = money / 250
+            else:
+                total_units = money / 350
 
-            st.markdown("---")
-            st.success(f"💰 کۆی گشتی پارەکە: **{total_cost:,}** دینار")
+        st.info(f"⚡ بڕی کارەبای بەکارهاتوو: **{round(total_units, 2):,}** kWh")
 
-# ==========================================
-# 3. Execution
-# ==========================================
 if __name__ == "__main__":
     app = ElectricityCalculator()
-    app.run_calculation()
-
+    app.run()
