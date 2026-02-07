@@ -13,7 +13,7 @@ st.markdown("""
         text-align: center !important; width: 100%; font-size: 18px; font-weight: bold;
     }
     .stButton > button {
-        display: block; margin: 20px auto !important; width: 200px !important;
+        display: block; margin: 20px auto !important; width: 250px !important;
         height: 50px; background-color: #007bff; color: white; font-size: 18px !important;
         border: none; border-radius: 8px;
     }
@@ -34,27 +34,37 @@ class ElectricityCalculator:
         st.title("سیستەمی پێشکەوتووی هەژمارکردنی کارەبا")
         st.write("---")
 
-        # لێرە هەڵدەبژێریت چیت دەوێت
-        mode = st.radio(
-            "جۆری گۆڕین هەڵبژێرە:",
-            ["بڕی یەکە (kWh) ⬅️ نرخ (دینار)", "نرخ (دینار) ⬅️ بڕی یەکە (kWh)"]
-        )
-
         category = st.selectbox(
             "جۆری هاوبەش هەڵبژێرە:",
             ["ماڵان", "بازرگانی", "پیشەسازی گەورە", "پیشەسازی", "میری", "کشتوکاڵ"]
         )
 
-        val = st.number_input("بڕەکە داخڵ بکە:", min_value=0, step=1)
+        st.write("")
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            if st.button("🔢 kWh ➡️ دینار"):
+                st.session_state.mode = "kwh_to_dinar"
+        
+        with col2:
+            if st.button("💰 دینار ➡️ kWh"):
+                st.session_state.mode = "dinar_to_kwh"
 
-        if st.button("هەژمارکردن"):
-            if mode == "بڕی یەکە (kWh) ⬅️ نرخ (دینار)":
-                self.calculate_price(category, val)
-            else:
-                self.calculate_units(category, val)
+        if "mode" not in st.session_state:
+            st.session_state.mode = "kwh_to_dinar"
+
+        st.write("---")
+
+        if st.session_state.mode == "kwh_to_dinar":
+            kwh = st.number_input("بڕی کارەبا داخڵ بکە (kWh):", min_value=0, step=1)
+            if st.button("هەژمارکردن ⚡"):
+                self.calculate_price(category, kwh)
+        else:
+            money = st.number_input("بڕی پارە داخڵ بکە (دینار):", min_value=0, step=1000)
+            if st.button("هەژمارکردن ⚡"):
+                self.calculate_units(category, money)
 
     def calculate_price(self, category, kwh):
-        # هەمان لۆژیکی کۆدە کۆنەکەت بۆ دەرکردنی نرخ
         total_cost = 0
         if category == "ماڵان":
             temp_usage = kwh
@@ -67,33 +77,29 @@ class ElectricityCalculator:
         else:
             total_cost = kwh * self.flat_rates[category]
         
-        st.success(f"💰 تێچووی گشتی: **{total_cost:,}** دینار")
+        st.success(f"💰 **تێچووی گشتی: {total_cost:,} دینار**")
 
     def calculate_units(self, category, money):
-        # ئەو لۆژیکەی خۆت کە ناردت بۆ دەرکردنی بڕی یەکە (kWh)
         total_units = 0
         
-        if category == "پیشەسازی گەورە":
-            total_units = money / 125
-        elif category == "بازرگانی":
-            total_units = money / 185
-        elif category in ["میری", "پیشەسازی"]:
-            total_units = money / 160
-        elif category == "کشتوکاڵ":
-            total_units = money / 60
-        else: # ماڵان بەپێی ئەو مەرجانەی خۆت داتنابوو
-            if money < 28800:
-                total_units = money / 72
-            elif 28800 <= money <= 86400:
-                total_units = money / 108
-            elif 86400 < money <= 210000:
-                total_units = money / 175
-            elif 210000 < money <= 400000:
-                total_units = money / 250
-            else:
-                total_units = money / 350
+        if category == "ماڵان":
+            remaining = money
+            tiers = [(400, 72), (400, 108), (400, 172), (400, 260), (999999, 350)]
+            
+            for limit, price in tiers:
+                if remaining > 0:
+                    max_cost_this_tier = limit * price
+                    if remaining >= max_cost_this_tier:
+                        total_units += limit
+                        remaining -= max_cost_this_tier
+                    else:
+                        total_units += remaining / price
+                        remaining = 0
+                        break
+        else:
+            total_units = money / self.flat_rates[category]
 
-        st.info(f"⚡ بڕی کارەبای بەکارهاتوو: **{round(total_units, 2):,}** kWh")
+        st.info(f"⚡ **بڕی کارەبا: {round(total_units, 2):,} kWh**")
 
 if __name__ == "__main__":
     app = ElectricityCalculator()
