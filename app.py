@@ -67,16 +67,24 @@ class ElectricityCalculator:
         st.title("⚡ سیستەمی پێشکەوتووی هەژمارکردنی کارەبا ⚡")
         st.write("---")
         
-        # هەڵبژاردنی جۆری حیساب
-        main_option = st.radio(
-            "جۆری حیساب هەڵبژێرە:",
-            ["💰 هەژمارکردنی نرخ", "🔧 حیسابی تەکنیکی"],
-            horizontal=True
-        )
+        # دەستپێکردنی حاڵەت
+        if "main_mode" not in st.session_state:
+            st.session_state.main_mode = "price"
+        
+        # دوو دووگمە بۆ هەڵبژاردنی بەش
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            if st.button("هەژمارکردنی نرخ", use_container_width=True, type="primary"):
+                st.session_state.main_mode = "price"
+        
+        with col2:
+            if st.button("حیسابی تەکنیکی", use_container_width=True, type="secondary"):
+                st.session_state.main_mode = "technical"
         
         st.write("---")
         
-        if main_option == "💰 هەژمارکردنی نرخ":
+        if st.session_state.main_mode == "price":
             self.price_calculator()
         else:
             self.technical_calculator()
@@ -135,47 +143,47 @@ class ElectricityCalculator:
         
         calc_type = st.selectbox(
             "جۆری حیساب هەڵبژێرە:",
-            ["Watt بۆ Ampere", "Watt بۆ kWh", "Ampere بۆ kWh"]
+            ["وات بۆ ئەمپێر", "وات بۆ کیلۆوات", "ئەمپێر بۆ کیلۆوات"]
         )
         
         st.write("")
         
-        if calc_type == "Watt بۆ Ampere":
+        if calc_type == "وات بۆ ئەمپێر":
             self.watt_to_ampere()
-        elif calc_type == "Watt بۆ kWh":
+        elif calc_type == "وات بۆ کیلۆوات":
             self.watt_to_kwh()
         else:
             self.ampere_to_kwh()
 
     def watt_to_ampere(self):
-        """گۆڕینی Watt بۆ Ampere"""
+        """گۆڕینی وات بۆ ئەمپێر"""
         st.markdown('<div class="calculator-card">', unsafe_allow_html=True)
-        st.write("### گۆڕینی Watt بۆ Ampere")
-        st.write(f"**ڤۆڵت:** {self.volt} V")
+        st.write("### گۆڕینی وات بۆ ئەمپێر")
+        st.write(f"**ڤۆڵت:** {self.volt} ڤۆڵت")
         st.write("")
         
         col1, col2 = st.columns(2)
         with col1:
-            watt = st.number_input("Watt داخڵ بکە:", min_value=0, step=10, key="watt_amp")
+            watt = st.number_input("وات داخڵ بکە:", min_value=0, step=10, key="watt_amp")
         
         st.markdown('</div>', unsafe_allow_html=True)
         
         if st.button("حیسابکردن", type="primary", use_container_width=True, key="calc_watt_amp"):
             if watt > 0:
                 ampere = watt / self.volt
-                st.markdown(f'<div class="result-box">💡 ئەنجام: {ampere:.2f} Ampere</div>', unsafe_allow_html=True)
-                st.info(f"**فۆرمول:** Ampere = Watt ÷ Volt")
-                st.info(f"**حیساب:** {watt} ÷ {self.volt} = {ampere:.2f} A")
+                st.markdown(f'<div class="result-box">ئەنجام: {ampere:.2f} ئەمپێر</div>', unsafe_allow_html=True)
+                st.info(f"**فۆرمول:** ئەمپێر = وات ÷ ڤۆڵت")
+                st.info(f"**حیساب:** {watt} ÷ {self.volt} = {ampere:.2f} ئەمپێر")
 
     def watt_to_kwh(self):
-        """گۆڕینی Watt بۆ kWh"""
+        """گۆڕینی وات بۆ کیلۆوات"""
         st.markdown('<div class="calculator-card">', unsafe_allow_html=True)
-        st.write("### گۆڕینی Watt بۆ kWh")
+        st.write("### گۆڕینی وات بۆ کیلۆوات")
         st.write("")
         
         col1, col2 = st.columns(2)
         with col1:
-            watt = st.number_input("Watt داخڵ بکە:", min_value=0, step=10, key="watt_kwh")
+            watt = st.number_input("وات داخڵ بکە:", min_value=0, step=10, key="watt_kwh")
         with col2:
             hours = st.number_input("کاتژمێر داخڵ بکە:", min_value=0, step=1, key="hours_kwh")
         
@@ -184,20 +192,20 @@ class ElectricityCalculator:
         if st.button("حیسابکردن", type="primary", use_container_width=True, key="calc_watt_kwh"):
             if watt > 0 and hours > 0:
                 kwh = (watt * hours) / 1000
-                st.markdown(f'<div class="result-box">⚡ ئەنجام: {kwh:.2f} kWh</div>', unsafe_allow_html=True)
-                st.info(f"**فۆرمول:** kWh = (Watt × کاتژمێر) ÷ 1000")
-                st.info(f"**حیساب:** ({watt} × {hours}) ÷ 1000 = {kwh:.2f} kWh")
+                st.markdown(f'<div class="result-box">ئەنجام: {kwh:.2f} کیلۆوات</div>', unsafe_allow_html=True)
+                st.info(f"**فۆرمول:** کیلۆوات = (وات × کاتژمێر) ÷ 1000")
+                st.info(f"**حیساب:** ({watt} × {hours}) ÷ 1000 = {kwh:.2f} کیلۆوات")
 
     def ampere_to_kwh(self):
-        """گۆڕینی Ampere بۆ kWh"""
+        """گۆڕینی ئەمپێر بۆ کیلۆوات"""
         st.markdown('<div class="calculator-card">', unsafe_allow_html=True)
-        st.write("### گۆڕینی Ampere بۆ kWh")
-        st.write(f"**ڤۆڵت:** {self.volt} V")
+        st.write("### گۆڕینی ئەمپێر بۆ کیلۆوات")
+        st.write(f"**ڤۆڵت:** {self.volt} ڤۆڵت")
         st.write("")
         
         col1, col2 = st.columns(2)
         with col1:
-            ampere = st.number_input("Ampere داخڵ بکە:", min_value=0.0, step=0.1, key="amp_kwh")
+            ampere = st.number_input("ئەمپێر داخڵ بکە:", min_value=0.0, step=0.1, key="amp_kwh")
         with col2:
             hours = st.number_input("کاتژمێر داخڵ بکە:", min_value=0, step=1, key="hours_amp")
         
@@ -206,9 +214,9 @@ class ElectricityCalculator:
         if st.button("حیسابکردن", type="primary", use_container_width=True, key="calc_amp_kwh"):
             if ampere > 0 and hours > 0:
                 kwh = (ampere * self.volt * hours) / 1000
-                st.markdown(f'<div class="result-box">⚡ ئەنجام: {kwh:.2f} kWh</div>', unsafe_allow_html=True)
-                st.info(f"**فۆرمول:** kWh = (Ampere × Volt × کاتژمێر) ÷ 1000")
-                st.info(f"**حیساب:** ({ampere} × {self.volt} × {hours}) ÷ 1000 = {kwh:.2f} kWh")
+                st.markdown(f'<div class="result-box">ئەنجام: {kwh:.2f} کیلۆوات</div>', unsafe_allow_html=True)
+                st.info(f"**فۆرمول:** کیلۆوات = (ئەمپێر × ڤۆڵت × کاتژمێر) ÷ 1000")
+                st.info(f"**حیساب:** ({ampere} × {self.volt} × {hours}) ÷ 1000 = {kwh:.2f} کیلۆوات")
 
     def calculate_price(self, category, kwh):
         """kWh دەگۆڕێت بۆ دینار"""
