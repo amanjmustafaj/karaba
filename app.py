@@ -101,16 +101,36 @@ class ElectricityCalculator:
         total_cost = 0
         
         if category == "ماڵان":
+            st.write("### وردەکاری هەژمارکردن:")
+            st.write("")
+            
             temp_usage = kwh
-            for limit, price in self.home_tiers:
+            tier_names = ["پلەی یەکەم", "پلەی دووەم", "پلەی سێیەم", "پلەی چوارەم", "پلەی پێنجەم"]
+            
+            for idx, (limit, price) in enumerate(self.home_tiers):
                 if temp_usage > 0:
                     consumed = min(temp_usage, limit)
-                    total_cost += consumed * price
+                    cost = consumed * price
+                    total_cost += cost
+                    
+                    # پیشاندانی هەر پلەیەک بە ستوونەکان
+                    col1, col2, col3, col4 = st.columns(4)
+                    with col1:
+                        st.write(f"**{tier_names[idx]}**")
+                    with col2:
+                        st.write(f"{consumed:,.0f} kWh")
+                    with col3:
+                        st.write(f"{price} دینار")
+                    with col4:
+                        st.write(f"{cost:,.0f} دینار")
+                    
                     temp_usage -= consumed
+            
+            st.write("---")
+            st.success(f"### کۆی گشتی: {total_cost:,} دینار")
         else:
             total_cost = kwh * self.flat_rates[category]
-        
-        st.success(f"تێچووی گشتی: {total_cost:,} دینار")
+            st.success(f"تێچووی گشتی: {total_cost:,} دینار")
 
     def calculate_units(self, category, money):
         """دینار دەگۆڕێت بۆ kWh"""
