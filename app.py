@@ -3,7 +3,7 @@ import streamlit as st
 # ==========================================
 # 1. Page Configuration & Styling
 # ==========================================
-st.set_page_config(page_title="هەژمارکردنی کارەبا", page_icon="⚡")
+st.set_page_config(page_title="هەژمارکردنی کارەبا", page_icon="⚡", layout="wide")
 
 st.markdown("""
     <style>
@@ -22,6 +22,24 @@ st.markdown("""
         transform: scale(1.05);
         box-shadow: 0 5px 15px rgba(0,0,0,0.3);
     }
+    .calculator-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 30px;
+        border-radius: 15px;
+        color: white;
+        margin: 20px 0;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
+    .result-box {
+        background: white;
+        color: #333;
+        padding: 20px;
+        border-radius: 10px;
+        margin: 15px 0;
+        font-size: 24px;
+        font-weight: bold;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
     </style>
     """, unsafe_allow_html=True)
 
@@ -35,7 +53,6 @@ class ElectricityCalculator:
             "کشتوکاڵ": 60
         }
         
-        # پلەکانی ماڵان
         self.home_tiers = [
             (400, 72),
             (400, 108),
@@ -43,11 +60,32 @@ class ElectricityCalculator:
             (400, 265),
             (999999, 350)
         ]
+        
+        self.volt = 220  # ڤۆڵتی ستاندارد
 
     def run(self):
-        st.title("سیستەمی هەژمارکردنی کارەبا")
+        st.title("⚡ سیستەمی پێشکەوتووی هەژمارکردنی کارەبا ⚡")
         st.write("---")
+        
+        # هەڵبژاردنی جۆری حیساب
+        main_option = st.radio(
+            "جۆری حیساب هەڵبژێرە:",
+            ["💰 هەژمارکردنی نرخ", "🔧 حیسابی تەکنیکی"],
+            horizontal=True
+        )
+        
+        st.write("---")
+        
+        if main_option == "💰 هەژمارکردنی نرخ":
+            self.price_calculator()
+        else:
+            self.technical_calculator()
 
+    def price_calculator(self):
+        """حیسابکردنی نرخی کارەبا"""
+        st.subheader("هەژمارکردنی نرخی کارەبا")
+        st.write("")
+        
         category = st.selectbox(
             "جۆری هاوبەش هەڵبژێرە:",
             ["ماڵان", "بازرگانی", "پیشەسازی گەورە", "پیشەسازی", "میری", "کشتوکاڵ"]
@@ -90,6 +128,88 @@ class ElectricityCalculator:
                 else:
                     st.warning("تکایە ژمارەیەک زیاتر لە سفر داخڵ بکە")
 
+    def technical_calculator(self):
+        """حیسابە تەکنیکییەکان"""
+        st.subheader("حیسابە تەکنیکییەکانی کارەبا")
+        st.write("")
+        
+        calc_type = st.selectbox(
+            "جۆری حیساب هەڵبژێرە:",
+            ["Watt بۆ Ampere", "Watt بۆ kWh", "Ampere بۆ kWh"]
+        )
+        
+        st.write("")
+        
+        if calc_type == "Watt بۆ Ampere":
+            self.watt_to_ampere()
+        elif calc_type == "Watt بۆ kWh":
+            self.watt_to_kwh()
+        else:
+            self.ampere_to_kwh()
+
+    def watt_to_ampere(self):
+        """گۆڕینی Watt بۆ Ampere"""
+        st.markdown('<div class="calculator-card">', unsafe_allow_html=True)
+        st.write("### گۆڕینی Watt بۆ Ampere")
+        st.write(f"**ڤۆڵت:** {self.volt} V")
+        st.write("")
+        
+        col1, col2 = st.columns(2)
+        with col1:
+            watt = st.number_input("Watt داخڵ بکە:", min_value=0, step=10, key="watt_amp")
+        
+        st.markdown('</div>', unsafe_allow_html=True)
+        
+        if st.button("حیسابکردن", type="primary", use_container_width=True, key="calc_watt_amp"):
+            if watt > 0:
+                ampere = watt / self.volt
+                st.markdown(f'<div class="result-box">💡 ئەنجام: {ampere:.2f} Ampere</div>', unsafe_allow_html=True)
+                st.info(f"**فۆرمول:** Ampere = Watt ÷ Volt")
+                st.info(f"**حیساب:** {watt} ÷ {self.volt} = {ampere:.2f} A")
+
+    def watt_to_kwh(self):
+        """گۆڕینی Watt بۆ kWh"""
+        st.markdown('<div class="calculator-card">', unsafe_allow_html=True)
+        st.write("### گۆڕینی Watt بۆ kWh")
+        st.write("")
+        
+        col1, col2 = st.columns(2)
+        with col1:
+            watt = st.number_input("Watt داخڵ بکە:", min_value=0, step=10, key="watt_kwh")
+        with col2:
+            hours = st.number_input("کاتژمێر داخڵ بکە:", min_value=0, step=1, key="hours_kwh")
+        
+        st.markdown('</div>', unsafe_allow_html=True)
+        
+        if st.button("حیسابکردن", type="primary", use_container_width=True, key="calc_watt_kwh"):
+            if watt > 0 and hours > 0:
+                kwh = (watt * hours) / 1000
+                st.markdown(f'<div class="result-box">⚡ ئەنجام: {kwh:.2f} kWh</div>', unsafe_allow_html=True)
+                st.info(f"**فۆرمول:** kWh = (Watt × کاتژمێر) ÷ 1000")
+                st.info(f"**حیساب:** ({watt} × {hours}) ÷ 1000 = {kwh:.2f} kWh")
+
+    def ampere_to_kwh(self):
+        """گۆڕینی Ampere بۆ kWh"""
+        st.markdown('<div class="calculator-card">', unsafe_allow_html=True)
+        st.write("### گۆڕینی Ampere بۆ kWh")
+        st.write(f"**ڤۆڵت:** {self.volt} V")
+        st.write("")
+        
+        col1, col2 = st.columns(2)
+        with col1:
+            ampere = st.number_input("Ampere داخڵ بکە:", min_value=0.0, step=0.1, key="amp_kwh")
+        with col2:
+            hours = st.number_input("کاتژمێر داخڵ بکە:", min_value=0, step=1, key="hours_amp")
+        
+        st.markdown('</div>', unsafe_allow_html=True)
+        
+        if st.button("حیسابکردن", type="primary", use_container_width=True, key="calc_amp_kwh"):
+            if ampere > 0 and hours > 0:
+                kwh = (ampere * self.volt * hours) / 1000
+                st.markdown(f'<div class="result-box">⚡ ئەنجام: {kwh:.2f} kWh</div>', unsafe_allow_html=True)
+                st.info(f"**فۆرمول:** kWh = (Ampere × Volt × کاتژمێر) ÷ 1000")
+                st.info(f"**حیساب:** ({ampere} × {self.volt} × {hours}) ÷ 1000 = {kwh:.2f} kWh")
+
     def calculate_price(self, category, kwh):
         """kWh دەگۆڕێت بۆ دینار"""
         total_cost = 0
@@ -122,7 +242,6 @@ class ElectricityCalculator:
             st.markdown("---")
             st.success(f"### کۆی گشتی: {total_cost:,} دینار")
             
-            # زانیاری تەنها بۆ ماڵان
             st.markdown("---")
             st.write("### نرخەکانی کارەبا بۆ ماڵان:")
             st.write("")
@@ -147,7 +266,6 @@ class ElectricityCalculator:
             total_cost = kwh * self.flat_rates[category]
             st.success(f"### کۆی گشتی: {total_cost:,} دینار")
             
-            # زانیاری تەنها بۆ ئەو کاتیگۆرییە
             st.markdown("---")
             st.write(f"### نرخی کارەبا بۆ {category}:")
             st.write("")
@@ -177,7 +295,6 @@ class ElectricityCalculator:
 
         st.info(f"### بڕی کارەبا: {round(total_units, 2):,} kWh")
         
-        # زانیاری تەنها بۆ ئەو کاتیگۆرییە
         st.markdown("---")
         if category == "ماڵان":
             st.write("### نرخەکانی کارەبا بۆ ماڵان:")
