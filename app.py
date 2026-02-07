@@ -9,17 +9,18 @@ st.markdown("""
     <style>
     .stApp { text-align: center; direction: rtl; }
     h1, h2, h3, p, div { text-align: center !important; }
-    .stSelectbox label, .stNumberInput label, .stRadio label {
+    .stSelectbox label, .stNumberInput label {
         text-align: center !important; width: 100%; font-size: 18px; font-weight: bold;
     }
-    .stRadio > div { justify-content: center !important; }
     .stButton > button {
-        display: block; margin: 20px auto !important; width: 250px !important;
-        height: 55px; background-color: #28a745; color: white; font-size: 20px !important;
-        border: none; border-radius: 10px; font-weight: bold;
+        display: block; margin: 10px auto !important; width: 280px !important;
+        height: 60px; color: white; font-size: 20px !important;
+        border: none; border-radius: 12px; font-weight: bold;
+        transition: all 0.3s ease;
     }
     .stButton > button:hover {
-        background-color: #218838;
+        transform: scale(1.05);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.3);
     }
     </style>
     """, unsafe_allow_html=True)
@@ -55,30 +56,45 @@ class ElectricityCalculator:
 
         st.write("")
         
-        # ڕادیۆ بۆ هەڵبژاردنی ئاراستە
-        mode = st.radio(
-            "جۆری هەژمارکردن:",
-            ["🔢 kWh ➡️ دینار", "💰 دینار ➡️ kWh"],
-            horizontal=True
-        )
+        # دەستپێکردنی حاڵەت
+        if "mode" not in st.session_state:
+            st.session_state.mode = "kwh_to_dinar"
+
+        # دوو دووگمە بۆ هەڵبژاردنی ئاراستە
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            kwh_button = st.button("🔢 kWh ➡️ دینار", use_container_width=True, type="primary")
+            if kwh_button:
+                st.session_state.mode = "kwh_to_dinar"
+        
+        with col2:
+            dinar_button = st.button("💰 دینار ➡️ kWh", use_container_width=True, type="secondary")
+            if dinar_button:
+                st.session_state.mode = "dinar_to_kwh"
 
         st.write("---")
 
         # هەژمارکردن بەپێی ئاراستە
-        if mode == "🔢 kWh ➡️ دینار":
+        if st.session_state.mode == "kwh_to_dinar":
+            st.subheader("🔢 گۆڕینی kWh بۆ دینار")
             kwh = st.number_input("بڕی کارەبا داخڵ بکە (kWh):", min_value=0, step=1)
-            if st.button("⚡ هەژمارکردن"):
+            
+            if st.button("⚡ هەژمارکردن", type="primary", use_container_width=True):
                 if kwh > 0:
                     self.calculate_price(category, kwh)
                 else:
-                    st.warning("تکایە ژمارەیەک زیاتر لە سفر داخڵ بکە!")
+                    st.warning("⚠️ تکایە ژمارەیەک زیاتر لە سفر داخڵ بکە!")
+        
         else:
+            st.subheader("💰 گۆڕینی دینار بۆ kWh")
             money = st.number_input("بڕی پارە داخڵ بکە (دینار):", min_value=0, step=1000)
-            if st.button("⚡ هەژمارکردن"):
+            
+            if st.button("⚡ هەژمارکردن", type="primary", use_container_width=True):
                 if money > 0:
                     self.calculate_units(category, money)
                 else:
-                    st.warning("تکایە ژمارەیەک زیاتر لە سفر داخڵ بکە!")
+                    st.warning("⚠️ تکایە ژمارەیەک زیاتر لە سفر داخڵ بکە!")
 
     def calculate_price(self, category, kwh):
         """kWh دەگۆڕێت بۆ دینار"""
@@ -95,7 +111,6 @@ class ElectricityCalculator:
             total_cost = kwh * self.flat_rates[category]
         
         st.success(f"💰 **تێچووی گشتی: {total_cost:,} دینار**")
-        st.balloons()
 
     def calculate_units(self, category, money):
         """دینار دەگۆڕێت بۆ kWh"""
@@ -123,7 +138,6 @@ class ElectricityCalculator:
             total_units = money / self.flat_rates[category]
 
         st.info(f"⚡ **بڕی کارەبا: {round(total_units, 2):,} kWh**")
-        st.balloons()
 
 if __name__ == "__main__":
     app = ElectricityCalculator()
