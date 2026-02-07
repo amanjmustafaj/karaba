@@ -130,18 +130,18 @@ class ElectricityCalculator:
         col1, col2 = st.columns(2)
         
         with col1:
-            if st.button("kWh بۆ دینار", use_container_width=True, type="primary"):
+            if st.button("کیلۆوات بۆ دینار", use_container_width=True, type="primary"):
                 st.session_state.mode = "kwh_to_dinar"
         
         with col2:
-            if st.button("دینار بۆ kWh", use_container_width=True, type="secondary"):
+            if st.button("دینار بۆ کیلۆوات", use_container_width=True, type="secondary"):
                 st.session_state.mode = "dinar_to_kwh"
 
         st.write("---")
 
         if st.session_state.mode == "kwh_to_dinar":
-            st.subheader("گۆڕینی kWh بۆ دینار")
-            kwh = st.number_input("بڕی کارەبا داخڵ بکە (kWh):", min_value=0, step=1)
+            st.subheader("گۆڕینی کیلۆوات بۆ دینار")
+            kwh = st.number_input("بڕی کارەبا داخڵ بکە (کیلۆوات):", min_value=0, step=1)
             
             if st.button("هەژمارکردن", type="primary", use_container_width=True):
                 if kwh > 0:
@@ -150,7 +150,7 @@ class ElectricityCalculator:
                     st.warning("تکایە ژمارەیەک زیاتر لە سفر داخڵ بکە")
         
         else:
-            st.subheader("گۆڕینی دینار بۆ kWh")
+            st.subheader("گۆڕینی دینار بۆ کیلۆوات")
             money = st.number_input("بڕی پارە داخڵ بکە (دینار):", min_value=0, step=1000)
             
             if st.button("هەژمارکردن", type="primary", use_container_width=True):
@@ -240,10 +240,6 @@ class ElectricityCalculator:
                 with col4:
                     agriculture_cost = monthly_kwh * self.flat_rates["کشتوکاڵ"]
                     st.info(f"**کشتوکاڵ:**\n\n{agriculture_cost:,.0f} دینار")
-                
-                
-                # وردەکاری حیساب
-
 
     def calculate_home_cost(self, kwh):
         """حیسابکردنی نرخ بۆ ماڵان بە پلەکان"""
@@ -325,7 +321,7 @@ class ElectricityCalculator:
                 st.info(f"**حیساب:** ({ampere} × {self.volt} × {hours}) ÷ 1000 = {kwh:.2f} کیلۆوات")
 
     def calculate_price(self, category, kwh):
-        """kWh دەگۆڕێت بۆ دینار"""
+        """کیلۆوات دەگۆڕێت بۆ دینار"""
         total_cost = 0
         
         if category == "ماڵان":
@@ -345,7 +341,7 @@ class ElectricityCalculator:
                     with col1:
                         st.write(f"**{tier_names[idx]}**")
                     with col2:
-                        st.write(f"{consumed:,.0f} kWh")
+                        st.write(f"{consumed:,.0f} کیلۆوات")
                     with col3:
                         st.write(f"{price} دینار")
                     with col4:
@@ -383,10 +379,10 @@ class ElectricityCalculator:
             st.markdown("---")
             st.write(f"### نرخی کارەبا بۆ {category}:")
             st.write("")
-            st.write(f"**نرخی هەر یەکە:** {self.flat_rates[category]} دینار/kWh")
+            st.write(f"**نرخی هەر کیلۆوات:** {self.flat_rates[category]} دینار")
 
     def calculate_units(self, category, money):
-        """دینار دەگۆڕێت بۆ kWh"""
+        """دینار دەگۆڕێت بۆ کیلۆوات"""
         total_units = 0
         
         if category == "ماڵان":
@@ -407,7 +403,7 @@ class ElectricityCalculator:
         else:
             total_units = money / self.flat_rates[category]
 
-        st.info(f"### بڕی کارەبا: {round(total_units, 2):,} kWh")
+        st.info(f"### بڕی کارەبا: {round(total_units, 2):,} کیلۆوات")
         
         st.markdown("---")
         if category == "ماڵان":
@@ -432,7 +428,7 @@ class ElectricityCalculator:
         else:
             st.write(f"### نرخی کارەبا بۆ {category}:")
             st.write("")
-            st.write(f"**نرخی هەر یەکە:** {self.flat_rates[category]} دینار/kWh")
+            st.write(f"**نرخی هەر کیلۆوات:** {self.flat_rates[category]} دینار")
 
 if __name__ == "__main__":
     app = ElectricityCalculator()
