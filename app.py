@@ -9,14 +9,12 @@ st.markdown("""
     <style>
     .stApp { text-align: center; direction: rtl; }
     
-    /* هێنانە ناوەندی تایتڵ */
     .main-title {
         text-align: center;
         color: #2c3e50;
         margin-bottom: 30px;
     }
 
-    /* ستایلی گشتی دوگمەکان */
     .stButton > button {
         display: block; margin: 5px auto !important; width: 100% !important;
         max-width: 280px; height: 50px; color: white !important; font-size: 17px !important;
@@ -25,31 +23,34 @@ st.markdown("""
         transition: all 0.2s ease;
     }
     
-    /* کاتێک دوگمەیەک دادەگیرێت و چالاکە */
     .stButton > button:focus, .stButton > button:active {
         background-color: #FF4B4B !important;
         color: white !important;
         border: none !important;
     }
 
-    /* ستایلی خشتە بە Markdown */
-    .result-table {
-        margin-left: auto;
-        margin-right: auto;
-        border-collapse: collapse;
-        width: 80%;
-        margin-top: 20px;
-    }
-
     hr { border-top: 1px solid #ACBFA4; opacity: 0.3; margin: 20px 0; }
+    
+    /* ستایلی خشتەی زانیارییەکان */
+    .info-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 20px 0;
+    }
     </style>
     """, unsafe_allow_html=True)
 
 class ElectricityPro:
     def __init__(self):
+        # نرخە جێگیرەکان (بۆ هەر ١ کیلۆوات)
         self.flat_rates = {
-            "بازرگانی": 185, "پیشەسازی گەورە": 125, "پیشەسازی": 160, "میری": 160, "کشتوکاڵ": 60
+            "بازرگانی": 185, 
+            "پیشەسازی گەورە": 125, 
+            "پیشەسازی": 160, 
+            "میری": 160, 
+            "کشتوکاڵ": 60
         }
+        # پلەکانی ماڵان
         self.home_tiers = [
             ("پلەی یەکەم (1-400)", 400, 72),
             ("پلەی دووەم (401-800)", 400, 108),
@@ -67,7 +68,8 @@ class ElectricityPro:
     def main(self):
         st.markdown("<h1 class='main-title'>هەژمارکردنی نرخی کارەبا</h1>", unsafe_allow_html=True)
         
-        col1, col2, col3 = st.columns(3)
+        # زیادکردنی دوگمەی "زانیاری" بۆ هێدەرەکە
+        col1, col2, col3, col4 = st.columns(4)
         with col1:
             if st.button("هەژمارکردنی نرخ"):
                 st.session_state.page = "price"
@@ -75,6 +77,9 @@ class ElectricityPro:
             if st.button("حیسابی تەکنیکی"):
                 st.session_state.page = "technical"
         with col3:
+            if st.button("زانیاری"):
+                st.session_state.page = "info"
+        with col4:
             if st.button("دەربارە"):
                 st.session_state.page = "about"
         
@@ -84,8 +89,32 @@ class ElectricityPro:
             self.page_price_calc()
         elif st.session_state.page == "technical":
             self.page_technical_calc()
+        elif st.session_state.page == "info":
+            self.page_info()
         else:
             self.page_about()
+
+    def page_info(self):
+        st.header("زانیاری نرخەکانی کارەبا")
+        st.write("لێرەدا تێچووی هەر ١ کیلۆوات (kWh) بۆ هەموو جۆرەکان ڕوون کراوەتەوە:")
+        
+        # خشتەی نرخە جێگیرەکان
+        info_md = "| جۆری کارەبا | نرخی ١ کیلۆوات (دینار) |\n"
+        info_md += "| :--- | :---: |\n"
+        for cat, price in self.flat_rates.items():
+            info_md += f"| {cat} | {price} |\n"
+        st.markdown(info_md)
+        
+        st.write("---")
+        
+        # خشتەی پلەکانی ماڵان
+        st.subheader("خشتەی پلەکانی کارەبای ماڵان")
+        home_md = "| پلەی بەکارهێنان | بڕی یەکە (kWh) | نرخی یەکە (دینار) |\n"
+        home_md += "| :--- | :---: | :---: |\n"
+        for name, limit, price in self.home_tiers:
+            limit_str = "بێ سنوور" if limit > 100000 else limit
+            home_md += f"| {name} | {limit_str} | {price} |\n"
+        st.markdown(home_md)
 
     def page_price_calc(self):
         st.header("هەژمارکردنی نرخ")
@@ -116,33 +145,22 @@ class ElectricityPro:
                 st.info(f"بڕی کارەبا: {units:,.2f} کیلۆوات")
 
     def show_home_details_no_pandas(self, kwh):
-        """پیشاندانی وردەکاری حیسابی ماڵان بە خشتەی سادە بەبێ پانداس"""
         temp_kwh = kwh
         total_price = 0
-        
-        # دروستکردنی هێدەر و سەری خشتەکە بە Markdown
         table_md = "| پلەی هەژمارکردن | بڕی یەکە (kWh) | نرخی یەکە | کۆی تێچوو |\n"
         table_md += "| :--- | :---: | :---: | :---: |\n"
         
-        found_data = False
         for name, limit, price in self.home_tiers:
-            if temp_kwh <= 0:
-                break
-            
+            if temp_kwh <= 0: break
             consumed = min(temp_kwh, limit)
             cost = consumed * price
             total_price += cost
-            
             table_md += f"| {name} | {consumed:,.0f} | {price} دینار | {cost:,.0f} دینار |\n"
             temp_kwh -= consumed
-            found_data = True
         
-        if found_data:
-            st.write("### وردەکاری هەژمارکردن بۆ ماڵان")
-            st.markdown(table_md)
-            st.success(f"### کۆی گشتی: {total_price:,.0f} دینار")
-        else:
-            st.warning("تکایە ژمارەیەکی دروست داخڵ بکە.")
+        st.write("### وردەکاری هەژمارکردن بۆ ماڵان")
+        st.markdown(table_md)
+        st.success(f"### کۆی گشتی: {total_price:,.0f} دینار")
 
     def page_technical_calc(self):
         st.header("حیسابی تەکنیکی")
