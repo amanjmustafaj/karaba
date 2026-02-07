@@ -16,10 +16,10 @@ st.markdown("""
         display: block; margin: 10px auto !important; width: 280px !important;
         height: 60px; color: white; font-size: 20px !important;
         border: none; border-radius: 12px; font-weight: bold;
-        transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        transition: all 0.3s ease;
     }
     .stButton > button:hover {
-        background-color: #5a67d8 !important;
+        transform: scale(1.05);
         box-shadow: 0 5px 15px rgba(0,0,0,0.3);
     }
     .calculator-card {
@@ -98,51 +98,51 @@ class ElectricityCalculator:
             self.technical_calculator()
 
     def price_calculator(self):
-    """حیسابکردنی نرخی کارەبا"""
-    st.subheader("هەژمارکردنی نرخی کارەبا")
-    st.write("")
-    
-    category = st.selectbox(
-        "جۆری هاوبەش هەڵبژێرە:",
-        ["ماڵان", "بازرگانی", "پیشەسازی گەورە", "پیشەسازی", "میری", "کشتوکاڵ"]
-    )
+        """حیسابکردنی نرخی کارەبا"""
+        st.subheader("هەژمارکردنی نرخی کارەبا")
+        st.write("")
+        
+        category = st.selectbox(
+            "جۆری هاوبەش هەڵبژێرە:",
+            ["ماڵان", "بازرگانی", "پیشەسازی گەورە", "پیشەسازی", "میری", "کشتوکاڵ"]
+        )
 
-    st.write("")
-    
-    if "mode" not in st.session_state:
-        st.session_state.mode = "kwh_to_dinar"
-
-    col1, col2 = st.columns(2)
-    
-    with col1:
-        if st.button("کیلۆوات بۆ دینار", use_container_width=True, type="primary"):
+        st.write("")
+        
+        if "mode" not in st.session_state:
             st.session_state.mode = "kwh_to_dinar"
-    
-    with col2:
-        if st.button("دینار بۆ کیلۆوات", use_container_width=True, type="secondary"):
-            st.session_state.mode = "dinar_to_kwh"
 
-    st.write("---")
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            if st.button("kWh بۆ دینار", use_container_width=True, type="primary"):
+                st.session_state.mode = "kwh_to_dinar"
+        
+        with col2:
+            if st.button("دینار بۆ kWh", use_container_width=True, type="secondary"):
+                st.session_state.mode = "dinar_to_kwh"
 
-    if st.session_state.mode == "kwh_to_dinar":
-        st.subheader("گۆڕینی کیلۆوات بۆ دینار")
-        kwh = st.number_input("بڕی کارەبا داخڵ بکە (کیلۆوات):", min_value=0, step=1)
+        st.write("---")
+
+        if st.session_state.mode == "kwh_to_dinar":
+            st.subheader("گۆڕینی kWh بۆ دینار")
+            kwh = st.number_input("بڕی کارەبا داخڵ بکە (kWh):", min_value=0, step=1)
+            
+            if st.button("هەژمارکردن", type="primary", use_container_width=True):
+                if kwh > 0:
+                    self.calculate_price(category, kwh)
+                else:
+                    st.warning("تکایە ژمارەیەک زیاتر لە سفر داخڵ بکە")
         
-        if st.button("هەژمارکردن", type="primary", use_container_width=True):
-            if kwh > 0:
-                self.calculate_price(category, kwh)
-            else:
-                st.warning("تکایە ژمارەیەک زیاتر لە سفر داخڵ بکە")
-    
-    else:
-        st.subheader("گۆڕینی دینار بۆ کیلۆوات")
-        money = st.number_input("بڕی پارە داخڵ بکە (دینار):", min_value=0, step=1000)
-        
-        if st.button("هەژمارکردن", type="primary", use_container_width=True):
-            if money > 0:
-                self.calculate_units(category, money)
-            else:
-                st.warning("تکایە ژمارەیەک زیاتر لە سفر داخڵ بکە")
+        else:
+            st.subheader("گۆڕینی دینار بۆ kWh")
+            money = st.number_input("بڕی پارە داخڵ بکە (دینار):", min_value=0, step=1000)
+            
+            if st.button("هەژمارکردن", type="primary", use_container_width=True):
+                if money > 0:
+                    self.calculate_units(category, money)
+                else:
+                    st.warning("تکایە ژمارەیەک زیاتر لە سفر داخڵ بکە")
 
     def technical_calculator(self):
         """حیسابە تەکنیکییەکان"""
