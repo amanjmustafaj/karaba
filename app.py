@@ -21,6 +21,14 @@ st.markdown("""
         background-color: #EAEFEF !important;
     }
 
+    /* ستایلی هێڵە باریکەکە */
+    hr {
+        margin-top: 1rem;
+        margin-bottom: 1rem;
+        border: 0;
+        border-top: 1px solid #ddd; /* هێڵێکی زۆر باریک و کاڵ */
+    }
+
     /* ستایلی دوگمەکە */
     .stButton > button {
         display: block; margin: 10px auto !important; width: 280px !important;
@@ -96,7 +104,7 @@ class ElectricityCalculator:
 
     def run(self):
         st.title("⚡ سیستەمی پێشکەوتووی هەژمارکردنی کارەبا ⚡")
-        st.write("---")
+        st.markdown("<hr>", unsafe_allow_html=True) # هێڵی باریک
         
         # دەستپێکردنی حاڵەت
         if "main_mode" not in st.session_state:
@@ -113,7 +121,7 @@ class ElectricityCalculator:
             if st.button("حیسابی تەکنیکی", use_container_width=True, type="secondary"):
                 st.session_state.main_mode = "technical"
         
-        st.write("---")
+        st.markdown("<hr>", unsafe_allow_html=True) # هێڵی باریک
         
         if st.session_state.main_mode == "price":
             self.price_calculator()
@@ -145,7 +153,7 @@ class ElectricityCalculator:
             if st.button("دینار بۆ کیلۆوات", use_container_width=True, type="secondary"):
                 st.session_state.mode = "dinar_to_kwh"
 
-        st.write("---")
+        st.markdown("<hr>", unsafe_allow_html=True)
 
         if st.session_state.mode == "kwh_to_dinar":
             st.subheader("گۆڕینی کیلۆوات بۆ دینار")
@@ -225,7 +233,7 @@ class ElectricityCalculator:
                 st.markdown('</div>', unsafe_allow_html=True)
                 
                 # حیسابکردنی نرخەکان بۆ جۆرە جیاوازەکان
-                st.write("---")
+                st.markdown("<hr>", unsafe_allow_html=True)
                 st.write("### 💰 نرخی کارەبا بە پێی جۆری هاوبەش")
                 st.write("")
                 
@@ -357,10 +365,10 @@ class ElectricityCalculator:
                     
                     temp_usage -= consumed
             
-            st.markdown("---")
+            st.markdown("<hr>", unsafe_allow_html=True)
             st.success(f"### کۆی گشتی: {total_cost:,} دینار")
             
-            st.markdown("---")
+            st.markdown("<hr>", unsafe_allow_html=True)
             st.write("### نرخەکانی کارەبا بۆ ماڵان:")
             st.write("")
             col1, col2, col3, col4, col5 = st.columns(5)
@@ -384,7 +392,7 @@ class ElectricityCalculator:
             total_cost = kwh * self.flat_rates[category]
             st.success(f"### کۆی گشتی: {total_cost:,} دینار")
             
-            st.markdown("---")
+            st.markdown("<hr>", unsafe_allow_html=True)
             st.write(f"### نرخی کارەبا بۆ {category}:")
             st.write("")
             st.write(f"**نرخی هەر کیلۆوات:** {self.flat_rates[category]} دینار")
@@ -413,7 +421,7 @@ class ElectricityCalculator:
 
         st.info(f"### بڕی کارەبا: {round(total_units, 2):,} کیلۆوات")
         
-        st.markdown("---")
+        st.markdown("<hr>", unsafe_allow_html=True)
         if category == "ماڵان":
             st.write("### نرخەکانی کارەبا بۆ ماڵان:")
             st.write("")
