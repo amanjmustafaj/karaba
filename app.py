@@ -18,7 +18,7 @@ st.markdown("""
         display: block; margin: 10px auto !important; width: 280px !important;
         height: 60px; color: white !important; font-size: 20px !important;
         border: none; border-radius: 12px; font-weight: bold;
-        background-color: black !important; /* ڕەنگی ئاسایی: ڕەش */
+        background-color: #ACBFA4 !important; /* ڕەنگی نوێ لێرە دانرا */
         transition: background-color 0.2s ease;
     }
     
