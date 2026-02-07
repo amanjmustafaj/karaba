@@ -12,16 +12,25 @@ st.markdown("""
     .stSelectbox label, .stNumberInput label {
         text-align: center !important; width: 100%; font-size: 18px; font-weight: bold;
     }
+    
+    /* ستایلی دوگمەکە بەو شێوەیەی داوات کردووە */
     .stButton > button {
         display: block; margin: 10px auto !important; width: 280px !important;
-        height: 60px; color: white; font-size: 20px !important;
+        height: 60px; color: white !important; font-size: 20px !important;
         border: none; border-radius: 12px; font-weight: bold;
-        transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        background-color: black !important; /* ڕەنگی ئاسایی: ڕەش */
+        transition: background-color 0.2s ease;
     }
+    
     .stButton > button:hover {
-        background-color: #5a67d8 !important;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        background-color: #667eea !important; /* کاتی هووڤەر: مۆر */
+        color: white !important;
     }
+    
+    .stButton > button:active {
+        background-color: red !important; /* کاتی داگرتن: سوور */
+    }
+
     .calculator-card {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         padding: 30px;
