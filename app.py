@@ -183,7 +183,6 @@ class ElectricityPro:
     def page_about(self):
         st.header("دەربارە")
         st.write("ئەم پڕۆگرامە بۆ هەژمارکردنی نرخ و حیسابە تەکنیکییەکان بەکار دێت.")
-        st.markdown("<p style='color: #ACBFA4; font-weight: bold;'>تایبەت بۆ کاک ئامانج</p>", unsafe_allow_html=True)
 
     def calc_money_to_units(self, money):
         total = 0
